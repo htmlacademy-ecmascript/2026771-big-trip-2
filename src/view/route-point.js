@@ -1,26 +1,48 @@
 import {createElement} from '../render.js';
 
-function createRoutePointTemplate() {
+function getIconSrc(pointType) {
+  const icons = {
+    Taxi: 'img/icons/taxi.png',
+    Bus: 'img/icons/bus.png',
+    Train: 'img/icons/train.png',
+    Flight: 'img/icons/flight.png',
+    'Check-in': 'img/icons/check-in.png',
+    Sightseeing: 'img/icons/sightseeing.png',
+    Ship: 'img/icons/ship.png',
+    Drive: 'img/icons/drive.png',
+    Restaurant: 'img/icons/restaurant.png'
+  };
+
+  return icons[pointType];
+}
+
+function createRoutePointTemplate(point) {
+const {price, pointTypes, cityNames} = point
+const iconSrc = getIconSrc(pointTypes);
+console.log(iconSrc)
   return (
     `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="2019-03-20">MAR 20</time>
+      <time class="event__date" datetime="2019-03-18">MAR 18</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/drive.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="${iconSrc}" alt="Event type icon">
       </div>
-      <h3 class="event__title">Drive Geneva</h3>
+      <h3 class="event__title">${pointTypes} ${cityNames}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-20T08:25">08:25</time>
+          <time class="event__start-time" datetime="2019-03-18T14:30">14:30</time>
           &mdash;
-          <time class="event__end-time" datetime="2019-03-20T09:25">09:25</time>
+          <time class="event__end-time" datetime="2019-03-18T16:05">16:05</time>
         </p>
-        <p class="event__duration">01H 00M</p>
+        <p class="event__duration">01H 35M</p>
       </div>
       <p class="event__price">
-        &euro;&nbsp;<span class="event__price-value">20</span>
+        &euro;&nbsp;<span class="event__price-value">${price}</span>
       </p>
-      <button class="event__favorite-btn" type="button">
+      <h4 class="visually-hidden">Offers:</h4>
+      <ul class="event__selected-offers">
+      </ul>
+      <button class="event__favorite-btn  event__favorite-btn--active" type="button">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
           <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -35,8 +57,11 @@ function createRoutePointTemplate() {
 }
 
 export default class RoutePoint {
+  constructor({point}) {
+    this.point = point;
+  }
   getTemplate() {
-    return createRoutePointTemplate();
+    return createRoutePointTemplate(this.point);
   }
 
   getElement() {

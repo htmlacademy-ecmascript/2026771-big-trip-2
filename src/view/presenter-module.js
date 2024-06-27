@@ -8,16 +8,20 @@ import Offer from './offer.js';
 import Destination from './destination.js';
 import FotoDestination from './foto-destination.js';
 import EditPoint from './edit-point.js';
+import SelectedOffers from './selected-offers.js';
 import {render, RenderPosition} from '../render.js';
 
 export default class Presenter {
 
-  constructor({ContentBlock, PageTopBlock}) {
+  constructor({ContentBlock, PageTopBlock, tripListModel}) {
     this.ContentBlock = ContentBlock;
     this.PageTopBlock = PageTopBlock;
+    this.tripListModel = tripListModel;
   }
 
   init() {
+    this.routingMap = [...this.tripListModel.getPoints()];
+
     render(new PageTop(), this.PageTopBlock, RenderPosition.AFTERBEGIN);
     render(new Sorting(), this.ContentBlock);
 
@@ -43,10 +47,12 @@ export default class Presenter {
     const secondEventDetailsElement = EventDetailsElements[1];
     render(new Offer(), secondEventDetailsElement);
     render(new Destination(), secondEventDetailsElement);
+    render(new FotoDestination(), secondEventDetailsElement);
 
-
-    for (let i = 0; i < 3; i++) {
-      render(new RoutePoint(), routePointList.getElement());
+    for (let i = 0; i < this.routingMap.length; i++) {
+      render(new RoutePoint({point: this.routingMap[i]}), routePointList.getElement());
+      const SelectedOffersElement = document.querySelectorAll('.event__selected-offers');
+    render(new SelectedOffers(), SelectedOffersElement[i]);
     }
 
 
