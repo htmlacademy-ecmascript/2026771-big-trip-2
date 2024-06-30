@@ -671,6 +671,10 @@ main {
   .event__input--price {
     width: 66px; }
 
+    .flatpickr-input {
+      width: 150px;
+  }
+
 .event__save-btn {
   margin-right: 18px; }
 
