@@ -40,7 +40,7 @@ export default class Presenter {
     const destinationComponent = new Destination(points[0], destinations);
     render(destinationComponent, EventDetailsElement);
 
-    render(new EditPoint( points[0], destinations, offers ), routePointContainer.getElement());
+    render(new EditPoint(points[0], destinations, offers), routePointContainer.getElement());
 
     const EventDetailsElements = document.querySelectorAll('.event__details');
     const secondEventDetailsElement = EventDetailsElements[1];

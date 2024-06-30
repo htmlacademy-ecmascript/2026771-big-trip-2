@@ -1,35 +1,35 @@
 import {createElement} from '../render.js';
-import flatpickr from "flatpickr";
-import "flatpickr/dist/flatpickr.css";
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.css';
 
 function createNewPointTemplate(point, destinations) {
 
   const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-const pointDestination = destinations.find((dest)=>dest.id === point.destination);
-const {basePrice, dateFrom, dateTo, type} = point;
-const {name, description, pictures} = pointDestination || {};
-const pointId = point.id || 0;
-const iconSrc = type.toLowerCase();
+  const pointDestination = destinations.find((dest)=>dest.id === point.destination);
+  const {dateFrom, dateTo, type} = point;
+  const {name} = pointDestination || {};
+  const pointId = point.id || 0;
+  const iconSrc = type.toLowerCase();
 
-document.addEventListener('DOMContentLoaded', function() {
-  const startTimeInput = document.getElementById(`event-start-time-${pointId}`);
-  const endTimeInput = document.getElementById(`event-end-time-${pointId}`);
+  document.addEventListener('DOMContentLoaded', () => {
+    const startTimeInput = document.getElementById(`event-start-time-${pointId}`);
+    const endTimeInput = document.getElementById(`event-end-time-${pointId}`);
 
-  flatpickr(startTimeInput, {
-    enableTime: true,
-    dateFormat: 'd/m/Y H:i',
-    onClose: function(selectedDates) {
+    const endTimePicker = flatpickr(endTimeInput, {
+      enableTime: true,
+      dateFormat: 'd/m/Y H:i',
+      minDate: startTimeInput.value,
+    });
 
-      endTimePicker.set('minDate', selectedDates[0] || null);
-    }
+    flatpickr(startTimeInput, {
+      enableTime: true,
+      dateFormat: 'd/m/Y H:i',
+      onClose: function(selectedDates) {
+
+        endTimePicker.set('minDate', selectedDates[0] || null);
+      }
+    });
   });
-
-  const endTimePicker = flatpickr(endTimeInput, {
-    enableTime: true,
-    dateFormat: 'd/m/Y H:i',
-    minDate: startTimeInput.value,
-  });
-});
 
   return (
     `<form class="event event--edit" action="#" method="post">
@@ -46,11 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <legend class="visually-hidden">Event type</legend>
 
             ${POINT_TYPES.map((pointType) => (
-              `<div class="event__type-item">
+      `<div class="event__type-item">
               <input id="event-type-${pointType}-${pointId}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}" ${pointType === type ? 'checked' : ''}>
               <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-${pointId}">${pointType[0].toUpperCase()}${pointType.slice(1)}</label>
             </div>`
-            )).join('')}
+    )).join('')}
 
           </fieldset>
         </div>
@@ -93,6 +93,7 @@ export default class NewPoint {
     this.destinations = destinations;
     this.offers = offers;
   }
+
   getTemplate() {
     return createNewPointTemplate(this.point, this.destinations, this.offers);
   }

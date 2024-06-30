@@ -14,14 +14,14 @@ function createDestinationTemplate(point, destinations) {
         <div class="event__photos-container">
         <div class="event__photos-tape">
         ${pictures && pictures.length > 0
-          ? pictures.map((picture) => `
+    ? pictures.map((picture) => `
         <img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')
-          : `<div></div>`}
+    : '<div></div>'}
         </div>
       </div>
       </section>`;
   } else {
-    return `<section class="event__section event__section--destination"></section>`;
+    return '<section class="event__section event__section--destination"></section>';
   }
 }
 

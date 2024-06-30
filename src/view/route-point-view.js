@@ -2,12 +2,12 @@ import {createElement} from '../render.js';
 import {calculateEventDuration} from '../utils.js';
 
 function createRoutePointTemplate(point, destinations, offers) {
-const {basePrice, dateFrom, dateTo, isFavorite, type} = point
-const iconSrc = type.toLowerCase();
-const typeOffers = offers.find((offer) => offer.type.toLowerCase() === type.toLowerCase()).offers;
-const pointOffers = typeOffers.filter((typeOffer) => point.offers.includes(typeOffer.id));
-const pointDestination = destinations.find((dest)=>dest.id === point.destination);
-const offersMarkup = pointOffers.length > 0 ? `
+  const {basePrice, dateFrom, dateTo, isFavorite, type} = point;
+  const iconSrc = type.toLowerCase();
+  const typeOffers = offers.find((offer) => offer.type.toLowerCase() === type.toLowerCase()).offers;
+  const pointOffers = typeOffers.filter((typeOffer) => point.offers.includes(typeOffer.id));
+  const pointDestination = destinations.find((dest)=>dest.id === point.destination);
+  const offersMarkup = pointOffers.length > 0 ? `
 <h4 class="visually-hidden">Offers:</h4>
 <ul class="event__selected-offers">
   ${pointOffers.map((offer) => (
@@ -61,6 +61,7 @@ export default class RoutePoint {
     this.destinations = destinations;
     this.offers = offers;
   }
+
   getTemplate() {
     return createRoutePointTemplate(this.point, this.destinations, this.offers);
   }
