@@ -61,8 +61,8 @@ export default class Presenter {
       onEditClick: () => {
         if (!editingMode) {
           editingMode = true;
-        replaceCardToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
+          replaceCardToForm();
+          document.addEventListener('keydown', escKeyDownHandler);
         }
       }
     });
