@@ -1,6 +1,6 @@
 import PageTop from './page-top-view.js';
 import Sorting from './list-sort-view.js';
-import NewPoint from './add-new-point-view.js';
+// import NewPoint from './add-new-point-view.js';
 import RoutePointContainer from './route-point-container-view.js';
 import RoutePointList from './route-points-list-view.js';
 import RoutePoint from './route-point-view.js';
@@ -9,7 +9,7 @@ import Destination from './destination-view.js';
 import EditPoint from './edit-point-view.js';
 import {render, RenderPosition, replace} from '../framework/render.js';
 import { isEscape } from '../utils.js';
-
+let editingMode = false;
 export default class Presenter {
   #contentBlock;
   #pageTopBlock;
@@ -57,8 +57,11 @@ export default class Presenter {
       destinations,
       offers,
       onEditClick: () => {
-        replaceCardToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
+        if (!editingMode) {
+          editingMode = true;
+          replaceCardToForm();
+          document.addEventListener('keydown', escKeyDownHandler);
+        }
       }
     });
 
@@ -68,24 +71,25 @@ export default class Presenter {
       offers,
       onFormSubmit: () => {
         replaceFormToCard();
+        editingMode = false;
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     });
 
-    const replaceCardToForm = () => {
+    function replaceCardToForm () {
       replace(pointEditComponent, pointComponent);
       const EventDetailsElements = document.querySelector('.event__details');
       render(new Offer(point, offers), EventDetailsElements);
       render(new Destination(point, destinations), EventDetailsElements);
-    };
+    }
 
-    const replaceFormToCard = () => {
+    function replaceFormToCard() {
       const EventDetailsElements = document.querySelector('.event__details');
       while (EventDetailsElements.firstChild) {
         EventDetailsElements.removeChild(EventDetailsElements.firstChild);
       }
       replace(pointComponent, pointEditComponent);
-    };
+    }
 
     render(pointComponent, this.#routePointList.element);
   }

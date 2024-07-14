@@ -27,8 +27,8 @@ function createDestinationTemplate(point, destinations) {
 
 
 export default class Destination extends AbstractView {
-#point;
-#destinations;
+  #point;
+  #destinations;
 
   constructor(point, destinations) {
     super();

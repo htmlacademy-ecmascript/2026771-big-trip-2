@@ -1,7 +1,7 @@
 import {POINT_COUNT} from '../constants.js';
- import {getRandomPoint} from '../mocks/route-point-mock.js';
- import {destinationMock} from '../mocks/destination-mock.js';
- import {offersMock} from '../mocks/offers-mock.js';
+import {getRandomPoint} from '../mocks/route-point-mock.js';
+import {destinationMock} from '../mocks/destination-mock.js';
+import {offersMock} from '../mocks/offers-mock.js';
 
 export default class TripListModel {
   #points = [];

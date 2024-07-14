@@ -93,7 +93,6 @@ export default class EditPoint extends AbstractView {
   #handleFormSubmit = null;
 
 
-
   constructor({point, destinations, offers, onFormSubmit}) {
     super();
     this.#point = point;
