@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createRoutePointContainerTemplate() {
   return (
@@ -6,20 +6,8 @@ function createRoutePointContainerTemplate() {
   );
 }
 
-export default class RoutePointContainer {
-  getTemplate() {
+export default class RoutePointContainer extends AbstractView {
+  get template() {
     return createRoutePointContainerTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

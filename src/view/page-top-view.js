@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createPageTopTemplate() {
   return (
@@ -16,20 +16,8 @@ function createPageTopTemplate() {
   );
 }
 
-export default class PageTop {
-  getTemplate() {
+export default class PageTop extends AbstractView {
+  get template() {
     return createPageTopTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

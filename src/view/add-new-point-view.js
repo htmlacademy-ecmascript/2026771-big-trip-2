@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 
@@ -87,26 +87,17 @@ function createNewPointTemplate(point, destinations) {
   );
 }
 
-export default class NewPoint {
-  constructor(point, destinations, offers) {
-    this.point = point;
-    this.destinations = destinations;
-    this.offers = offers;
+export default class NewPoint extends AbstractView {
+  #point;
+  #destinations;
+
+  constructor(point, destinations) {
+    super();
+    this.#point = point;
+    this.#destinations = destinations;
   }
 
-  getTemplate() {
-    return createNewPointTemplate(this.point, this.destinations, this.offers);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createNewPointTemplate(this.#point, this.#destinations);
   }
 }
