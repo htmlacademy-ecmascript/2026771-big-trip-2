@@ -9,7 +9,9 @@ import Destination from './destination-view.js';
 import EditPoint from './edit-point-view.js';
 import {render, RenderPosition, replace} from '../framework/render.js';
 import { isEscape } from '../utils.js';
+
 let editingMode = false;
+
 export default class Presenter {
   #contentBlock;
   #pageTopBlock;
@@ -59,8 +61,8 @@ export default class Presenter {
       onEditClick: () => {
         if (!editingMode) {
           editingMode = true;
-          replaceCardToForm();
-          document.addEventListener('keydown', escKeyDownHandler);
+        replaceCardToForm();
+        document.addEventListener('keydown', escKeyDownHandler);
         }
       }
     });
