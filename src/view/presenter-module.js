@@ -1,56 +1,98 @@
 import PageTop from './page-top-view.js';
 import Sorting from './list-sort-view.js';
-import NewPoint from './add-new-point-view.js';
+// import NewPoint from './add-new-point-view.js';
 import RoutePointContainer from './route-point-container-view.js';
 import RoutePointList from './route-points-list-view.js';
 import RoutePoint from './route-point-view.js';
 import Offer from './offer-view.js';
 import Destination from './destination-view.js';
 import EditPoint from './edit-point-view.js';
-import {render, RenderPosition} from '../render.js';
+import {render, RenderPosition, replace} from '../framework/render.js';
+import { isEscape } from '../utils.js';
+
+let editingMode = false;
 
 export default class Presenter {
+  #contentBlock;
+  #pageTopBlock;
+  #tripListModel;
+  #pageTop = new PageTop();
+  #sorting = new Sorting();
+  #routePointContainer = new RoutePointContainer();
+  #routePointList = new RoutePointList();
+
 
   constructor({ContentBlock, PageTopBlock, tripListModel}) {
-    this.ContentBlock = ContentBlock;
-    this.PageTopBlock = PageTopBlock;
-    this.tripListModel = tripListModel;
+    this.#contentBlock = ContentBlock;
+    this.#pageTopBlock = PageTopBlock;
+    this.#tripListModel = tripListModel;
   }
 
   init() {
-    const points = this.tripListModel.getPoints();
-    const destinations = this.tripListModel.getDestinations();
-    const offers = this.tripListModel.getOffers();
+    const points = this.#tripListModel.points;
+    const destinations = this.#tripListModel.destinations;
+    const offers = this.#tripListModel.offers;
 
-    render(new PageTop(), this.PageTopBlock, RenderPosition.AFTERBEGIN);
-    render(new Sorting(), this.ContentBlock);
+    render(this.#pageTop, this.#pageTopBlock, RenderPosition.AFTERBEGIN);
+    render(this.#sorting, this.#contentBlock);
 
-    const routePointList = new RoutePointList();
-    render(routePointList, this.ContentBlock);
+    render(this.#routePointList, this.#contentBlock);
 
-    const routePointContainer = new RoutePointContainer();
-    render(routePointContainer, routePointList.getElement());
-
-
-    const tripfieldComponent = new NewPoint(points[0], destinations, offers);
-    render(tripfieldComponent, routePointContainer.getElement());
-
-    const EventDetailsElement = document.querySelector('.event__details');
-    render(new Offer(points[0], offers), EventDetailsElement);
-    const destinationComponent = new Destination(points[0], destinations);
-    render(destinationComponent, EventDetailsElement);
-
-    render(new EditPoint(points[0], destinations, offers), routePointContainer.getElement());
-
-    const EventDetailsElements = document.querySelectorAll('.event__details');
-    const secondEventDetailsElement = EventDetailsElements[1];
-    render(new Offer(points[0], offers), secondEventDetailsElement);
-    render(new Destination(points[0], destinations), secondEventDetailsElement);
+    render(this.#routePointContainer, this.#routePointList.element);
 
     points.forEach((point) => {
-      const routePoint = new RoutePoint({ point, destinations, offers });
-      render(routePoint, routePointList.getElement());
+      this.#routePoint(point, destinations, offers);
     });
   }
-}
 
+  #routePoint(point, destinations, offers) {
+    const escKeyDownHandler = (evt) => {
+      if (isEscape(evt)) {
+        evt.preventDefault();
+        replaceFormToCard();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    const pointComponent = new RoutePoint({
+      point,
+      destinations,
+      offers,
+      onEditClick: () => {
+        if (!editingMode) {
+          editingMode = true;
+          replaceCardToForm();
+          document.addEventListener('keydown', escKeyDownHandler);
+        }
+      }
+    });
+
+    const pointEditComponent = new EditPoint({
+      point,
+      destinations,
+      offers,
+      onFormSubmit: () => {
+        replaceFormToCard();
+        editingMode = false;
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    });
+
+    function replaceCardToForm () {
+      replace(pointEditComponent, pointComponent);
+      const EventDetailsElements = document.querySelector('.event__details');
+      render(new Offer(point, offers), EventDetailsElements);
+      render(new Destination(point, destinations), EventDetailsElements);
+    }
+
+    function replaceFormToCard() {
+      const EventDetailsElements = document.querySelector('.event__details');
+      while (EventDetailsElements.firstChild) {
+        EventDetailsElements.removeChild(EventDetailsElements.firstChild);
+      }
+      replace(pointComponent, pointEditComponent);
+    }
+
+    render(pointComponent, this.#routePointList.element);
+  }
+}

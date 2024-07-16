@@ -1,5 +1,5 @@
 import Filter from './view/list-filter-view.js';
-import {render} from './render.js';
+import {render} from './framework/render.js';
 import Presenter from './view/presenter-module.js';
 import TripListModel from './model/trip-list-model.js';
 

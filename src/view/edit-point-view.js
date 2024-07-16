@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 
@@ -11,24 +11,18 @@ function createEditPointTemplate(point, destinations) {
   const pointId = point.id || 0;
   const iconSrc = type.toLowerCase();
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const startTimeInput = document.getElementById(`event-start-time-${pointId}`);
-    const endTimeInput = document.getElementById(`event-end-time-${pointId}`);
-    const endTimePicker = flatpickr(endTimeInput, {
-      enableTime: true,
-      dateFormat: 'd/m/Y H:i',
-      minDate: startTimeInput.value,
-    });
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
 
-    flatpickr(startTimeInput, {
-      enableTime: true,
-      dateFormat: 'd/m/Y H:i',
-      onClose: function(selectedDates) {
-
-        endTimePicker.set('minDate', selectedDates[0] || null);
-      }
-    });
-  });
+  const formattedDateFrom = formatDate(dateFrom);
+  const formattedDateTo = formatDate(dateTo);
 
   return (
     `<form class="event event--edit" action="#" method="post">
@@ -65,10 +59,10 @@ function createEditPointTemplate(point, destinations) {
 
   <div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${dateFrom}">
+    <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formattedDateFrom}">
     &mdash;
     <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${dateTo}">
+    <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formattedDateTo}">
   </div>
 
   <div class="event__field-group  event__field-group--price">
@@ -92,26 +86,50 @@ function createEditPointTemplate(point, destinations) {
   );
 }
 
-export default class EditPoint {
-  constructor(point, destinations, offers) {
-    this.point = point;
-    this.destinations = destinations;
-    this.offers = offers;
+export default class EditPoint extends AbstractView {
+  #point;
+  #destinations;
+  #offers;
+  #handleFormSubmit = null;
+
+
+  constructor({point, destinations, offers, onFormSubmit}) {
+    super();
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#handleFormSubmit = onFormSubmit;
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formSubmitHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formSubmitHandler);
+    this.#initFlatpickr();
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.destinations, this.offers);
+  get template() {
+    return createEditPointTemplate(this.#point, this.#destinations, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 
-    return this.element;
-  }
+  #initFlatpickr() {
+    const startTimeInput = this.element.querySelector(`#event-start-time-${this.#point.id}`);
+    const endTimeInput = this.element.querySelector(`#event-end-time-${this.#point.id}`);
 
-  removeElement() {
-    this.element = null;
+    const endTimePicker = flatpickr(endTimeInput, {
+      enableTime: true,
+      dateFormat: 'd/m/Y H:i',
+      minDate: startTimeInput.value,
+    });
+
+    flatpickr(startTimeInput, {
+      enableTime: true,
+      dateFormat: 'd/m/Y H:i',
+      onClose: function(selectedDates) {
+        endTimePicker.set('minDate', selectedDates[0] || null);
+      }
+    });
   }
 }

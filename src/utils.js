@@ -31,4 +31,6 @@ function calculateEventDuration(dateFrom, dateTo) {
   return result.trim();
 }
 
-export {getRandomArrayElement, getRandomNumber, calculateEventDuration};
+const isEscape = (evt) => evt.key === 'Escape';
+
+export {getRandomArrayElement, getRandomNumber, calculateEventDuration, isEscape};
