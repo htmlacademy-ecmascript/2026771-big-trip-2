@@ -1,13 +1,14 @@
-import PageTop from './page-top-view.js';
-import Sorting from './list-sort-view.js';
-// import NewPoint from './add-new-point-view.js';
-import RoutePointContainer from './route-point-container-view.js';
-import RoutePointList from './route-points-list-view.js';
-import RoutePoint from './route-point-view.js';
-import Offer from './offer-view.js';
-import Destination from './destination-view.js';
-import EditPoint from './edit-point-view.js';
-import {render, RenderPosition, replace} from '../framework/render.js';
+import { MessageWithoutPoint } from '../constants.js';
+import PageTop from '/src/view/page-top-view.js';
+import Sorting from '/src/view/list-sort-view.js';
+import RoutePointContainer from '/src/view/route-point-container-view.js';
+import RoutePointList from '/src/view/route-points-list-view.js';
+import RoutePoint from '/src/view/route-point-view.js';
+import Offer from '/src/view/offer-view.js';
+import Destination from '/src/view/destination-view.js';
+import EditPoint from '/src/view/edit-point-view.js';
+import ListEmpty from '/src/view/list-empty-view.js';
+import { render, RenderPosition, replace } from '../framework/render.js';
 import { isEscape } from '../utils.js';
 
 let editingMode = false;
@@ -33,11 +34,14 @@ export default class Presenter {
     const destinations = this.#tripListModel.destinations;
     const offers = this.#tripListModel.offers;
 
+    if (points.length === 0) {
+      render(new ListEmpty(MessageWithoutPoint.EVERYTHING), this.#contentBlock);
+      return;
+    }
+
     render(this.#pageTop, this.#pageTopBlock, RenderPosition.AFTERBEGIN);
     render(this.#sorting, this.#contentBlock);
-
     render(this.#routePointList, this.#contentBlock);
-
     render(this.#routePointContainer, this.#routePointList.element);
 
     points.forEach((point) => {
@@ -50,6 +54,7 @@ export default class Presenter {
       if (isEscape(evt)) {
         evt.preventDefault();
         replaceFormToCard();
+        editingMode = false;
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     };

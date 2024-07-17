@@ -7,8 +7,8 @@ export const routePointMock = [
   {
     id: 'f4b62099-293f-4c3d-a702-94eec4a2808f',
     basePrice: getRandomNumber(MinPrice, MaxPrice),
-    dateFrom: '2019-08-10T23:21:00.845Z',
-    dateTo: '2019-08-12T23:22:00.375Z',
+    dateFrom: '2025-01-10T23:21:00.845Z',
+    dateTo: '2025-01-12T23:22:00.375Z',
     destination: 'cfe416cq-10xa-ye10-8077-2fs9a01edcaa',
     isFavorite: true,
     offers: [
@@ -19,8 +19,8 @@ export const routePointMock = [
   {
     id: 'f4b62099-293f-4c3d-a702-94eec4a2808g',
     basePrice: getRandomNumber(MinPrice, MaxPrice),
-    dateFrom: '2019-07-10T22:55:56.845Z',
-    dateTo: '2019-07-11T17:22:13.375Z',
+    dateFrom: '2019-03-18T22:55:56.845Z',
+    dateTo: '2019-03-19T17:22:13.375Z',
     destination: 'cfe416cq-10xa-ye10-8077-2fs9a01edcas',
     isFavorite: false,
     offers: [],
@@ -42,8 +42,8 @@ export const routePointMock = [
   {
     id: 'f4b62099-293f-4c3d-a702-94eec4a2808j',
     basePrice: getRandomNumber(MinPrice, MaxPrice),
-    dateFrom: '2019-07-11T10:55:56.845Z',
-    dateTo: '2019-07-11T11:48:53.375Z',
+    dateFrom: '2019-12-11T10:55:56.845Z',
+    dateTo: '2019-12-14T11:48:53.375Z',
     destination: 'cfe416cq-10xa-ye10-8077-2fs9a01edcaf',
     isFavorite: true,
     offers: [
@@ -65,8 +65,8 @@ export const routePointMock = [
   {
     id: 'f4b62099-293f-4c3d-a702-94eec4a2808n',
     basePrice: getRandomNumber(MinPrice, MaxPrice),
-    dateFrom: '2019-09-23T13:50:56.845Z',
-    dateTo: '2019-07-24T10:15:13.375Z',
+    dateFrom: '2025-09-23T13:50:56.845Z',
+    dateTo: '2025-09-24T10:15:13.375Z',
     destination: 'cfe416cq-10xa-ye10-8077-2fs9a01edcaa',
     isFavorite: true,
     offers: [
