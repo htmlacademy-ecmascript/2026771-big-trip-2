@@ -11,19 +11,6 @@ function createEditPointTemplate(point, destinations) {
   const pointId = point.id || 0;
   const iconSrc = type.toLowerCase();
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = String(date.getFullYear()).slice(-2);
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  }
-
-  const formattedDateFrom = formatDate(dateFrom);
-  const formattedDateTo = formatDate(dateTo);
-
   return (
     `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -59,10 +46,10 @@ function createEditPointTemplate(point, destinations) {
 
   <div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formattedDateFrom}">
+    <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${dateFrom}">
     &mdash;
     <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formattedDateTo}">
+    <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${dateTo}">
   </div>
 
   <div class="event__field-group  event__field-group--price">
@@ -120,13 +107,13 @@ export default class EditPoint extends AbstractView {
 
     const endTimePicker = flatpickr(endTimeInput, {
       enableTime: true,
-      dateFormat: 'd/m/Y H:i',
+      dateFormat: 'd/m/y H:i',
       minDate: startTimeInput.value,
     });
 
     flatpickr(startTimeInput, {
       enableTime: true,
-      dateFormat: 'd/m/Y H:i',
+      dateFormat: 'd/m/y H:i',
       onClose: function(selectedDates) {
         endTimePicker.set('minDate', selectedDates[0] || null);
       }

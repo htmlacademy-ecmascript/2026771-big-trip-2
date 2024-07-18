@@ -1,21 +1,20 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createEmptyTemplate() {
+function createEmptyTemplate(message) {
   return (
-    `<p class="trip-events__msg">Click New Event to create your first point</p>
-
-    <!--
-      Значение отображаемого текста зависит от выбранного фильтра:
-        * Everthing – 'Click New Event to create your first point'
-        * Past — 'There are no past events now';
-        * Present — 'There are no present events now';
-        * Future — 'There are no future events now'.
-    -->`
+    `<p class="trip-events__msg">${message}</p>`
   );
 }
 
 export default class ListEmpty extends AbstractView {
+  #message;
+
+  constructor (message) {
+    super();
+    this.#message = message;
+  }
+
   get template() {
-    return createEmptyTemplate();
+    return createEmptyTemplate(this.#message);
   }
 }

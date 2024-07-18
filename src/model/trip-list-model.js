@@ -12,6 +12,7 @@ export default class TripListModel {
     this.#points = Array.from({ length: POINT_COUNT }, getRandomPoint);
     this.#destinations = destinationMock;
     this.#offers = offersMock;
+
   }
 
   get points() {
