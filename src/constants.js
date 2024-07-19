@@ -7,4 +7,6 @@ const MessageWithoutPoint = {
   FUTURE: 'There are no future events now',
 };
 
-export { POINT_COUNT, MessageWithoutPoint };
+const FilterTypes = Object.keys(MessageWithoutPoint)
+
+export { POINT_COUNT, MessageWithoutPoint, FilterTypes };
