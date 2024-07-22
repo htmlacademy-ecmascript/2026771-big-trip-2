@@ -1,10 +1,9 @@
-import { render, replace, remove } from '../framework/render.js';
+import { render, replace } from '../framework/render.js';
 import RoutePoint from '/src/view/route-point-view.js';
 import Offer from '/src/view/offer-view.js';
 import Destination from '/src/view/destination-view.js';
 import EditPoint from '/src/view/edit-point-view.js';
 import { isEscape } from '../utils.js';
-
 let editingMode = false;
 
 export default class PointsPresenter {
@@ -14,12 +13,16 @@ export default class PointsPresenter {
   #routePointListElement;
   #pointComponents = new Map();
   #pointEditComponents = new Map();
+  #onBeforeChangeToEdit;
+  #onRollupClick;
 
-  constructor({ points, destinations, offers, routePointListElement }) {
+  constructor({ points, destinations, offers, routePointListElement, onBeforeChangeToEdit, onRollupClick }) {
     this.#points = points;
     this.#destinations = destinations;
     this.#offers = offers;
     this.#routePointListElement = routePointListElement;
+    this.#onBeforeChangeToEdit = onBeforeChangeToEdit;
+    this.#onRollupClick = onRollupClick;
   }
 
   init() {
@@ -28,22 +31,47 @@ export default class PointsPresenter {
     });
   }
 
+  #replaceCardToForm(point) {
+    const pointComponent = this.#pointComponents.get(point.id);
+    const pointEditComponent = this.#pointEditComponents.get(point.id);
+    if (pointComponent && pointComponent.element.parentElement) {
+      replace(pointEditComponent, pointComponent);
+      const eventDetailsElements = pointEditComponent.element.querySelector('.event__details');
+      render(new Offer(point, this.#offers), eventDetailsElements);
+      render(new Destination(point, this.#destinations), eventDetailsElements);
+    }
+  }
+
+  #replaceFormToCard(point) {
+    const pointComponent = this.#pointComponents.get(point.id);
+    const pointEditComponent = this.#pointEditComponents.get(point.id);
+    if (pointEditComponent && pointEditComponent.element.parentElement) {
+      const eventDetailsElements = pointEditComponent.element.querySelector('.event__details');
+      while (eventDetailsElements.firstChild) {
+        eventDetailsElements.removeChild(eventDetailsElements.firstChild);
+      }
+      replace(pointComponent, pointEditComponent);
+    }
+  }
+
   #renderPoint(point) {
     const escKeyDownHandler = (evt) => {
       if (isEscape(evt)) {
         evt.preventDefault();
-        replaceFormToCard(point);
+        this.#replaceFormToCard(point);
         editingMode = false;
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     };
 
     const handleEditClick = () => {
-      if (!editingMode) {
-        editingMode = true;
-        replaceCardToForm(point);
-        document.addEventListener('keydown', escKeyDownHandler);
+      if (this.#onBeforeChangeToEdit) {
+        this.#onBeforeChangeToEdit();
       }
+      this.resetAllPoints(point);
+      this.#replaceCardToForm(point);
+      editingMode = true;
+      document.addEventListener('keydown', escKeyDownHandler);
     };
 
     const handleFavoriteClick = (pointToUpdate) => {
@@ -69,7 +97,12 @@ export default class PointsPresenter {
           destinations: this.#destinations,
           offers: this.#offers,
           onFormSubmit: () => {
-            replaceFormToCard(point);
+            this.#replaceFormToCard(point);
+            editingMode = false;
+            document.removeEventListener('keydown', escKeyDownHandler);
+          },
+          onRollupClick: () => {
+            this.#replaceFormToCard(point);
             editingMode = false;
             document.removeEventListener('keydown', escKeyDownHandler);
           }
@@ -101,7 +134,12 @@ export default class PointsPresenter {
       destinations: this.#destinations,
       offers: this.#offers,
       onFormSubmit: () => {
-        replaceFormToCard(point);
+        this.#replaceFormToCard(point);
+        editingMode = false;
+        document.removeEventListener('keydown', escKeyDownHandler);
+      },
+      onRollupClick: () => {
+        this.#replaceFormToCard(point);
         editingMode = false;
         document.removeEventListener('keydown', escKeyDownHandler);
       }
@@ -109,38 +147,16 @@ export default class PointsPresenter {
 
     this.#pointEditComponents.set(point.id, pointEditComponent);
 
-    const replaceCardToForm = (point) => {
-      const pointComponent = this.#pointComponents.get(point.id);
-      const pointEditComponent = this.#pointEditComponents.get(point.id);
-      if (pointComponent && pointComponent.element.parentElement) {
-        replace(pointEditComponent, pointComponent);
-        const eventDetailsElements = pointEditComponent.element.querySelector('.event__details');
-        render(new Offer(point, this.#offers), eventDetailsElements);
-        render(new Destination(point, this.#destinations), eventDetailsElements);
-      }
-    };
-
-    const replaceFormToCard = (point) => {
-      const pointComponent = this.#pointComponents.get(point.id);
-      const pointEditComponent = this.#pointEditComponents.get(point.id);
-      if (pointEditComponent && pointEditComponent.element.parentElement) {
-        const eventDetailsElements = pointEditComponent.element.querySelector('.event__details');
-        while (eventDetailsElements.firstChild) {
-          eventDetailsElements.removeChild(eventDetailsElements.firstChild);
-        }
-        replace(pointComponent, pointEditComponent);
-      }
-    };
-
     render(pointComponent, this.#routePointListElement);
   }
+
+  resetAllPoints(point) {
+    this.#pointEditComponents.forEach(() => {
+      if (editingMode) {
+        this.#replaceFormToCard(point);
+      }
+    });
+  }
 }
-
-
-
-
-
-
-
 
 

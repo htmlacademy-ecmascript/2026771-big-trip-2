@@ -84,6 +84,7 @@ export default class RoutePoint extends AbstractView {
     evt.preventDefault();
     this.#handleEditClick();
   };
+
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleFavoriteClick(this.#point);
