@@ -1,5 +1,6 @@
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
+function getRandomArrayElement(items, count = 1) {
+  const shuffled = items.sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
 }
 
 function getRandomNumber(MinPrice, MaxPrice) {

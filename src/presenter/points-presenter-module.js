@@ -1,4 +1,4 @@
-import { render, RenderPosition, replace } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
 import RoutePoint from '/src/view/route-point-view.js';
 import Offer from '/src/view/offer-view.js';
 import Destination from '/src/view/destination-view.js';
@@ -12,6 +12,8 @@ export default class PointsPresenter {
   #destinations;
   #offers;
   #routePointListElement;
+  #pointComponents = new Map();
+  #pointEditComponents = new Map();
 
   constructor({ points, destinations, offers, routePointListElement }) {
     this.#points = points;
@@ -30,9 +32,57 @@ export default class PointsPresenter {
     const escKeyDownHandler = (evt) => {
       if (isEscape(evt)) {
         evt.preventDefault();
-        replaceFormToCard();
+        replaceFormToCard(point);
         editingMode = false;
         document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    const handleEditClick = () => {
+      if (!editingMode) {
+        editingMode = true;
+        replaceCardToForm(point);
+        document.addEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    const handleFavoriteClick = (pointToUpdate) => {
+      const updatedPoint = { ...pointToUpdate, isFavorite: !pointToUpdate.isFavorite };
+
+      const index = this.#points.findIndex((p) => p.id === pointToUpdate.id);
+      if (index !== -1) {
+        this.#points[index] = updatedPoint;
+
+        const oldPointComponent = this.#pointComponents.get(pointToUpdate.id);
+        const oldEditComponent = this.#pointEditComponents.get(pointToUpdate.id);
+
+        const newPointComponent = new RoutePoint({
+          point: updatedPoint,
+          destinations: this.#destinations,
+          offers: this.#offers,
+          onEditClick: handleEditClick,
+          onFavoriteClick: handleFavoriteClick
+        });
+
+        const newEditComponent = new EditPoint({
+          point: updatedPoint,
+          destinations: this.#destinations,
+          offers: this.#offers,
+          onFormSubmit: () => {
+            replaceFormToCard(point);
+            editingMode = false;
+            document.removeEventListener('keydown', escKeyDownHandler);
+          }
+        });
+
+        this.#pointComponents.set(updatedPoint.id, newPointComponent);
+        this.#pointEditComponents.set(updatedPoint.id, newEditComponent);
+
+        if (oldPointComponent && oldPointComponent.element.parentElement) {
+          replace(newPointComponent, oldPointComponent);
+        } else if (oldEditComponent && oldEditComponent.element.parentElement) {
+          replace(newEditComponent, oldEditComponent);
+        }
       }
     };
 
@@ -40,41 +90,57 @@ export default class PointsPresenter {
       point,
       destinations: this.#destinations,
       offers: this.#offers,
-      onEditClick: () => {
-        if (!editingMode) {
-          editingMode = true;
-          replaceCardToForm();
-          document.addEventListener('keydown', escKeyDownHandler);
-        }
-      }
+      onEditClick: handleEditClick,
+      onFavoriteClick: handleFavoriteClick
     });
+
+    this.#pointComponents.set(point.id, pointComponent);
 
     const pointEditComponent = new EditPoint({
       point,
       destinations: this.#destinations,
       offers: this.#offers,
       onFormSubmit: () => {
-        replaceFormToCard();
+        replaceFormToCard(point);
         editingMode = false;
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     });
 
-    const replaceCardToForm = () => {
-      replace(pointEditComponent, pointComponent);
-      const eventDetailsElements = document.querySelector('.event__details');
-      render(new Offer(point, this.#offers), eventDetailsElements);
-      render(new Destination(point, this.#destinations), eventDetailsElements);
+    this.#pointEditComponents.set(point.id, pointEditComponent);
+
+    const replaceCardToForm = (point) => {
+      const pointComponent = this.#pointComponents.get(point.id);
+      const pointEditComponent = this.#pointEditComponents.get(point.id);
+      if (pointComponent && pointComponent.element.parentElement) {
+        replace(pointEditComponent, pointComponent);
+        const eventDetailsElements = pointEditComponent.element.querySelector('.event__details');
+        render(new Offer(point, this.#offers), eventDetailsElements);
+        render(new Destination(point, this.#destinations), eventDetailsElements);
+      }
     };
 
-    const replaceFormToCard = () => {
-      const eventDetailsElements = document.querySelector('.event__details');
-      while (eventDetailsElements.firstChild) {
-        eventDetailsElements.removeChild(eventDetailsElements.firstChild);
+    const replaceFormToCard = (point) => {
+      const pointComponent = this.#pointComponents.get(point.id);
+      const pointEditComponent = this.#pointEditComponents.get(point.id);
+      if (pointEditComponent && pointEditComponent.element.parentElement) {
+        const eventDetailsElements = pointEditComponent.element.querySelector('.event__details');
+        while (eventDetailsElements.firstChild) {
+          eventDetailsElements.removeChild(eventDetailsElements.firstChild);
+        }
+        replace(pointComponent, pointEditComponent);
       }
-      replace(pointComponent, pointEditComponent);
     };
 
     render(pointComponent, this.#routePointListElement);
   }
 }
+
+
+
+
+
+
+
+
+
