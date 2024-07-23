@@ -16,6 +16,8 @@ export default class PointPresenter {
   #destinations;
   #offers;
   #mode = Mode.DEFAULT;
+  #offerComponent;
+  #destinationComponent;
 
   constructor({ routePointListElement, onDataChange, onModeChange }) {
     this.#routePointListElement = routePointListElement;
@@ -58,6 +60,7 @@ export default class PointPresenter {
 
     if (this.#mode === Mode.EDITING) {
       replace(this.#pointEditComponent, prevPointEditComponent);
+      this.#renderOffersAndDestinations();
     }
 
     remove(prevPointComponent);
@@ -77,6 +80,7 @@ export default class PointPresenter {
 
   #replaceCardToForm() {
     replace(this.#pointEditComponent, this.#pointComponent);
+    this.#renderOffersAndDestinations();
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
@@ -84,8 +88,27 @@ export default class PointPresenter {
 
   #replaceFormToCard() {
     replace(this.#pointComponent, this.#pointEditComponent);
+    this.#removeOffersAndDestinations();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
+  }
+
+  #renderOffersAndDestinations() {
+    const eventDetailsElement = this.#pointEditComponent.element.querySelector('.event__details');
+    this.#offerComponent = new Offer(this.#point, this.#offers);
+    this.#destinationComponent = new Destination(this.#point, this.#destinations);
+
+    render(this.#offerComponent, eventDetailsElement);
+    render(this.#destinationComponent, eventDetailsElement);
+  }
+
+  #removeOffersAndDestinations() {
+    if (this.#offerComponent) {
+      remove(this.#offerComponent);
+    }
+    if (this.#destinationComponent) {
+      remove(this.#destinationComponent);
+    }
   }
 
   #escKeyDownHandler = (evt) => {
@@ -101,7 +124,7 @@ export default class PointPresenter {
 
   #handleRollupClick = () => {
     this.#replaceFormToCard();
-  }
+  };
 
   #handleFavoriteClick = () => {
     this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
@@ -112,8 +135,3 @@ export default class PointPresenter {
     this.#replaceFormToCard();
   };
 }
-
-
-
-
-
