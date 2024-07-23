@@ -3,6 +3,11 @@ const POINT_COUNT = 10;
 const MaxPrice = 2000;
 const MinPrice = 15;
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 const MessageWithoutPoint = {
   EVERYTHING: 'Click New Event to create your first point',
   PAST: 'There are no past events now',
@@ -43,4 +48,4 @@ const offersID = [
 
 const FilterTypes = Object.keys(MessageWithoutPoint);
 
-export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types };
+export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode };

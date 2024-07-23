@@ -1,6 +1,6 @@
 import Filter from './view/list-filter-view.js';
 import {render} from './framework/render.js';
-import Presenter from './presenter/presenter-module.js';
+import Presenter from './presenter/main-presenter.js';
 import TripListModel from './model/trip-list-model.js';
 
 const sectionContentElement = document.querySelector('.trip-events');
