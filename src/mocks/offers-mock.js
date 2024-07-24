@@ -101,51 +101,6 @@ export const offersMock = [
         title: 'With automatic transmission 2',
         price: 54
       },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314baa93',
-        title: 'With automatic transmission 3',
-        price: 54
-      },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314baa94',
-        title: 'With automatic transmission 4',
-        price: 54
-      },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314baa95',
-        title: 'With automatic transmission 5',
-        price: 54
-      },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314baa96',
-        title: 'With automatic transmission 6',
-        price: 54
-      },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314baa97',
-        title: 'With automatic transmission 7',
-        price: 54
-      },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314baa98',
-        title: 'With automatic transmission 8',
-        price: 54
-      },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314baa99',
-        title: 'With automatic transmission 9',
-        price: 54
-      },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314bad92',
-        title: 'With automatic transmission 10',
-        price: 54
-      },
-      {
-        id: 'b4c3e4e6-9053-42ce-b747-e281314bag92',
-        title: 'With automatic transmission 11',
-        price: 54
-      }
     ]
   },
   {
