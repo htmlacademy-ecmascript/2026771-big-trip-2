@@ -48,4 +48,12 @@ const offersID = [
 
 const FilterTypes = Object.keys(MessageWithoutPoint);
 
-export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode };
+const SORT_TYPES = [
+  { type: 'day', active: 'checked' },
+  { type: 'event', active: 'disabled' },
+  { type: 'time' },
+  { type: 'price' },
+  { type: 'offer', active: 'disabled' }
+];
+
+export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES };

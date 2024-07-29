@@ -7,7 +7,7 @@ function getRandomNumber(MinPrice, MaxPrice) {
   return Math.floor(Math.random() * (MaxPrice - MinPrice + 1)) + MinPrice;
 }
 
-function calculateEventDuration(dateFrom, dateTo) {
+function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
   const start = new Date(dateFrom);
   const end = new Date(dateTo);
   const duration = end - start;
@@ -16,6 +16,10 @@ function calculateEventDuration(dateFrom, dateTo) {
   const days = Math.floor(totalMinutes / (60 * 24));
   const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
   const minutes = totalMinutes % 60;
+
+  if (forCalculation) {
+    return duration;
+  }
 
   let result = '';
 
