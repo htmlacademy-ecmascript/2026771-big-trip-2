@@ -2,10 +2,10 @@ import AbstractView from '../framework/view/abstract-view.js';
 import {calculateEventDuration} from '../utils.js';
 
 function createRoutePointTemplate(point, destinations, offers) {
-  const {basePrice, dateFrom, dateTo, isFavorite, type} = point;
+  const {basePrice, dateFrom, dateTo, isFavorite, type, offers: selectedOffers} = point;
   const iconSrc = type.toLowerCase();
   const typeOffers = offers.find((offer) => offer.type.toLowerCase() === type.toLowerCase()).offers;
-  const pointOffers = typeOffers.filter((typeOffer) => point.offers.includes(typeOffer.id));
+  const pointOffers = typeOffers.filter((typeOffer) => selectedOffers.includes(typeOffer.id));
   const pointDestination = destinations.find((dest)=>dest.id === point.destination);
   const offersMarkup = pointOffers.length > 0 ? `
 <h4 class="visually-hidden">Offers:</h4>

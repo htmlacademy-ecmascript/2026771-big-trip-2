@@ -3,8 +3,6 @@ import RoutePoint from '/src/view/route-point-view.js';
 import EditPoint from '/src/view/edit-point-view.js';
 import { isEscape } from '../utils.js';
 import { Mode } from '../constants.js';
-import Offer from '/src/view/offer-view.js';
-import Destination from '/src/view/destination-view.js';
 
 export default class PointPresenter {
   #routePointListElement;
@@ -60,7 +58,6 @@ export default class PointPresenter {
 
     if (this.#mode === Mode.EDITING) {
       replace(this.#pointEditComponent, prevPointEditComponent);
-      this.#renderOffersAndDestinations();
     }
 
     remove(prevPointComponent);
@@ -74,13 +71,13 @@ export default class PointPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#pointEditComponent.reset(this.#point);
       this.#replaceFormToCard();
     }
   }
 
   #replaceCardToForm() {
     replace(this.#pointEditComponent, this.#pointComponent);
-    this.#renderOffersAndDestinations();
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
@@ -91,15 +88,6 @@ export default class PointPresenter {
     this.#removeOffersAndDestinations();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
-  }
-
-  #renderOffersAndDestinations() {
-    const eventDetailsElement = this.#pointEditComponent.element.querySelector('.event__details');
-    this.#offerComponent = new Offer(this.#point, this.#offers);
-    this.#destinationComponent = new Destination(this.#point, this.#destinations);
-
-    render(this.#offerComponent, eventDetailsElement);
-    render(this.#destinationComponent, eventDetailsElement);
   }
 
   #removeOffersAndDestinations() {
@@ -114,6 +102,7 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (isEscape(evt)) {
       evt.preventDefault();
+      this.#pointEditComponent.reset(this.#point);
       this.#replaceFormToCard();
     }
   };

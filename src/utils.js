@@ -36,6 +36,19 @@ function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
   return result.trim();
 }
 
+function formatDateToISOString(dateStr, customISOString) {
+
+  const [day, month, yearAndTime] = dateStr.split('/');
+  const [year, time] = yearAndTime.split(' ');
+  const [hours, minutes] = time.split(':');
+  const timeZone = customISOString.slice(-4);
+  const isoDateStr = `20${year}-${month}-${day}T${hours}:${minutes}:00.${timeZone}`;
+  const date = new Date(isoDateStr);
+  const formattedDateStr = date.toISOString();
+
+  return formattedDateStr;
+}
+
 const isEscape = (evt) => evt.key === 'Escape';
 
 function countPointsByFilter(points) {
@@ -50,4 +63,4 @@ function countPointsByFilter(points) {
 }
 
 
-export {getRandomArrayElement, getRandomNumber, calculateEventDuration, isEscape, countPointsByFilter};
+export {getRandomArrayElement, getRandomNumber, calculateEventDuration, isEscape, countPointsByFilter, formatDateToISOString};
