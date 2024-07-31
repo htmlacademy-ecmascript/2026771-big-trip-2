@@ -146,6 +146,7 @@ export default class EditPoint extends AbstractStatefulView {
       type,
       offers: newOffers,
     });
+    this.#initFlatpickr();
   };
 
   #destinationChangeHandler = (evt) => {
