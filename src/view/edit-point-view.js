@@ -28,11 +28,11 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
               <legend class="visually-hidden">Event type</legend>
 
               ${POINT_TYPES.map((pointType) => (
-                `<div class="event__type-item">
+      `<div class="event__type-item">
                   <input id="event-type-${pointType}-${pointId}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}" ${pointType === type ? 'checked' : ''}>
                   <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-${pointId}">${pointType[0].toUpperCase()}${pointType.slice(1)}</label>
                 </div>`
-              )).join('')}
+    )).join('')}
 
             </fieldset>
           </div>
@@ -43,7 +43,7 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
           </label>
           <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${destinationTemplate ? name : ''}" list="destination-list-${pointId}">
           <datalist id="destination-list-${pointId}">
-          ${destinations.map(destination => `<option value="${destination.name}"></option>`).join('')}
+          ${destinations.map((destination) => `<option value="${destination.name}"></option>`).join('')}
           </datalist>
         </div>
         <div class="event__field-group  event__field-group--time">
@@ -108,13 +108,14 @@ export default class EditPoint extends AbstractStatefulView {
     this.updateElement(
       EditPoint.parsePointToState(point),
     );
+    this.#initFlatpickr();
   }
 
   _restoreHandlers() {
     this.element.querySelector('.event__save-btn').addEventListener('click', this.#formSubmitHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formSubmitHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollupClickHandler);
-    this.element.querySelectorAll('.event__type-input').forEach(input => input.addEventListener('change', this.#typeChangeHandler));
+    this.element.querySelectorAll('.event__type-input').forEach((input) => input.addEventListener('change', this.#typeChangeHandler));
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceInputHandler);
   }
@@ -124,10 +125,13 @@ export default class EditPoint extends AbstractStatefulView {
 
     const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
+    const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'))
+      .map((checkbox) => checkbox.id);
 
     this.updateElement({
       dateFrom: formatDateToISOString(startDateInput, this._state.dateTo),
       dateTo: formatDateToISOString(endDateInput, this._state.dateFrom),
+      offers: selectedOffers,
     });
     this.#handleFormSubmit(EditPoint.parseStateToPoint(this._state));
   };
@@ -136,11 +140,12 @@ export default class EditPoint extends AbstractStatefulView {
   #rollupClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleRollupClick();
+    this.#initFlatpickr();
   };
 
   #typeChangeHandler = (evt) => {
     const type = evt.target.value;
-    const newOffers = this.#offers.find(offer => offer.type === type).offers;
+    const newOffers = this.#offers.find((offer) => offer.type === type).offers;
 
     this.updateElement({
       type,
@@ -151,7 +156,7 @@ export default class EditPoint extends AbstractStatefulView {
 
   #destinationChangeHandler = (evt) => {
     const destinationName = evt.target.value;
-    const destination = this.#destinations.find(dest => dest.name === destinationName);
+    const destination = this.#destinations.find((dest) => dest.name === destinationName);
 
     if (destination) {
       this.updateElement({
@@ -159,6 +164,7 @@ export default class EditPoint extends AbstractStatefulView {
         description: destination.description,
         photos: destination.photos,
       });
+      this.#initFlatpickr();
     }
   };
 
@@ -169,6 +175,7 @@ export default class EditPoint extends AbstractStatefulView {
     });
   };
 
+  /* eslint-disable camelcase */
   #initFlatpickr() {
     const startTimeInput = this.element.querySelector(`#event-start-time-${this._state.id}`);
     const endTimeInput = this.element.querySelector(`#event-end-time-${this._state.id}`);
@@ -192,6 +199,7 @@ export default class EditPoint extends AbstractStatefulView {
     });
   }
 
+  /* eslint-enable camelcase */
   static parsePointToState(point) {
     return {
       ...point,
