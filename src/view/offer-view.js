@@ -4,12 +4,10 @@ function createOfferTemplate(point, offers) {
 
   const typeOffersObj = offers.find((offer) => offer.type === point.type);
   const typeOffers = typeOffersObj ? typeOffersObj.offers : [];
-  const pointOffers = typeOffers.filter((typeOffer) => point.offers.includes(typeOffer.id));
-  const pointId = point.id;
 
   if (typeOffers.length === 0) {
     return `<section class="event__section event__section--offers">
-  </section>`;
+    </section>`;
   }
 
   return (
@@ -18,8 +16,8 @@ function createOfferTemplate(point, offers) {
       <div class="event__available-offers">
         ${typeOffers.map((typeOffer) => (
       `<div class="event__offer-selector">
-            <input class="event__offer-checkbox visually-hidden" id="event-offer-${typeOffer.title.split(' ').join('_')}-${pointId}" type="checkbox" name="event-offer-${typeOffer.title.split(' ').join('_')}" ${pointOffers.some((offer) => offer.id === typeOffer.id) ? 'checked' : ''}>
-            <label class="event__offer-label" for="event-offer-${typeOffer.title.split(' ').join('_')}-${pointId}">
+            <input class="event__offer-checkbox visually-hidden" id="${typeOffer.id}" type="checkbox" name="event-offer-${typeOffer.id}" ${point.offers.includes(typeOffer.id) ? 'checked' : ''}>
+            <label class="event__offer-label" for="${typeOffer.id}">
               <span class="event__offer-title">${typeOffer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${typeOffer.price}</span>
