@@ -175,7 +175,7 @@ export default class EditPoint extends AbstractStatefulView {
     });
   };
 
-  /* eslint-disable camelcase */
+
   #initFlatpickr() {
     const startTimeInput = this.element.querySelector(`#event-start-time-${this._state.id}`);
     const endTimeInput = this.element.querySelector(`#event-end-time-${this._state.id}`);
@@ -185,6 +185,7 @@ export default class EditPoint extends AbstractStatefulView {
       static: true,
       dateFormat: 'd/m/y H:i',
       minDate: startTimeInput.value,
+      // eslint-disable-next-line camelcase
       time_24hr: true,
     });
 
@@ -192,6 +193,7 @@ export default class EditPoint extends AbstractStatefulView {
       enableTime: true,
       static: true,
       dateFormat: 'd/m/y H:i',
+      // eslint-disable-next-line camelcase
       time_24hr: true,
       onClose: function(selectedDates) {
         endTimePicker.set('minDate', selectedDates[0] || null);
@@ -199,7 +201,6 @@ export default class EditPoint extends AbstractStatefulView {
     });
   }
 
-  /* eslint-enable camelcase */
   static parsePointToState(point) {
     return {
       ...point,
