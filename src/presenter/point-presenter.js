@@ -11,38 +11,38 @@ export default class PointPresenter {
   #pointComponent;
   #pointEditComponent;
   #point;
-  #destinations;
-  #offers;
+  #destinationsModel;
+  #offersModel;
   #mode = Mode.DEFAULT;
-  #offerComponent;
-  #destinationComponent;
 
-  constructor({ routePointListElement, onDataChange, onModeChange }) {
+  constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange }) {
     this.#routePointListElement = routePointListElement;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
 
-  init(point, destinations, offers) {
+  init(point) {
     this.#point = point;
-    this.#destinations = destinations;
-    this.#offers = offers;
+    const destinations = this.#destinationsModel.destinations;
+    const offers = this.#offersModel.offers;
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
 
     this.#pointComponent = new RoutePoint({
       point: this.#point,
-      destinations: this.#destinations,
-      offers: this.#offers,
+      destinations: destinations,
+      offers: offers,
       onEditClick: this.#handleEditClick,
       onFavoriteClick: this.#handleFavoriteClick
     });
 
     this.#pointEditComponent = new EditPoint({
       point: this.#point,
-      destinations: this.#destinations,
-      offers: this.#offers,
+      destinations: destinations,
+      offers: offers,
       onFormSubmit: this.#handleFormSubmit,
       onRollupClick: this.#handleRollupClick
     });
@@ -85,18 +85,8 @@ export default class PointPresenter {
 
   #replaceFormToCard() {
     replace(this.#pointComponent, this.#pointEditComponent);
-    this.#removeOffersAndDestinations();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
-  }
-
-  #removeOffersAndDestinations() {
-    if (this.#offerComponent) {
-      remove(this.#offerComponent);
-    }
-    if (this.#destinationComponent) {
-      remove(this.#destinationComponent);
-    }
   }
 
   #escKeyDownHandler = (evt) => {

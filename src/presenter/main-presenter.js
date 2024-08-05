@@ -11,16 +11,20 @@ export default class Presenter {
   #contentBlock;
   #pageTopBlock;
   #tripListModel;
+  #destinationsModel;
+  #offersModel;
   #pageTop = new PageTop();
   #routePointList = new RoutePointList();
   #pointPresenters = new Map();
   #currentSortType = 'day';
   #sorting = null;
 
-  constructor({ ContentBlock, PageTopBlock, tripListModel }) {
+  constructor({ ContentBlock, PageTopBlock, tripListModel, destinationsModel, offersModel }) {
     this.#contentBlock = ContentBlock;
     this.#pageTopBlock = PageTopBlock;
     this.#tripListModel = tripListModel;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
 
     this.#sorting = new Sorting({ onSortTypeChange: this.#handleSortTypeChange });
   }
@@ -52,7 +56,7 @@ export default class Presenter {
   #updatePoints() {
     const points = this.#getSortedPoints();
     this.#clearPoints();
-    this.#renderPoints(points, this.#tripListModel.destinations, this.#tripListModel.offers);
+    this.#renderPoints(points);
 
   }
 
@@ -80,30 +84,26 @@ export default class Presenter {
     this.#routePointList.element.innerHTML = '';
   }
 
-  #renderPoints(points, destinations, offers) {
-    points.forEach((point) => this.#renderPoint(point, destinations, offers));
+  #renderPoints(points) {
+    points.forEach((point) => this.#renderPoint(point));
   }
 
-  #renderPoint(point, destinations, offers) {
+  #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       routePointListElement: this.#routePointList.element,
+      tripListModel: this.#tripListModel,
+      destinationsModel: this.#destinationsModel,
+      offersModel: this.#offersModel,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange
     });
 
-    pointPresenter.init(point, destinations, offers);
+    pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
   #handlePointChange = (updatedPoint) => {
-    const points = this.#tripListModel.points;
-    const index = points.findIndex((point) => point.id === updatedPoint.id);
-
-    if (!~index) {
-      return;
-    }
-
-    points[index] = updatedPoint;
+    this.#tripListModel.updatePoint(updatedPoint);
     this.#updatePoints();
   };
 
