@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import RoutePoint from '/src/view/route-point-view.js';
 import EditPoint from '/src/view/edit-point-view.js';
 import { isEscape } from '../utils.js';
-import { Mode } from '../constants.js';
+import { Mode, UserAction } from '../constants.js';
 
 export default class PointPresenter {
   #routePointListElement;
@@ -36,7 +36,8 @@ export default class PointPresenter {
       destinations: destinations,
       offers: offers,
       onEditClick: this.#handleEditClick,
-      onFavoriteClick: this.#handleFavoriteClick
+      onFavoriteClick: this.#handleFavoriteClick,
+      onDeleteClick: this.#handleDeleteClick,
     });
 
     this.#pointEditComponent = new EditPoint({
@@ -107,11 +108,20 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
+    this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite }, UserAction.UPDATE);
   };
 
   #handleFormSubmit = (updatedPoint) => {
-    this.#handleDataChange(updatedPoint);
+    if (updatedPoint === null) {
+      this.#handleDataChange(this.#point, UserAction.DELETE);
+    } else {
+      this.#handleDataChange(updatedPoint, UserAction.UPDATE);
+    }
     this.#replaceFormToCard();
   };
+
+  #handleDeleteClick = () => {
+    this.#handleFormSubmit(null);
+  };
 }
+

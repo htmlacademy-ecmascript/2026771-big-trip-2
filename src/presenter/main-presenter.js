@@ -6,7 +6,7 @@ import { render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { calculateEventDuration } from '../utils.js';
 import FilterPresenter from './filters-presenter.js';
-import { MessageWithoutPoint, FiltersScheme } from '../constants.js';
+import { MessageWithoutPoint, FiltersScheme, UserAction } from '../constants.js';
 
 export default class Presenter {
   #filterContentBlock;
@@ -52,28 +52,6 @@ export default class Presenter {
 
     const points = this.#getFilteredPoints();
 
-    if (points.length === 0) {
-      let message;
-      const currentFilter = this.#filterModel.filter;
-
-      switch (currentFilter) {
-          case FiltersScheme.PAST:
-              message = MessageWithoutPoint.PAST;
-              break;
-          case FiltersScheme.PRESENT:
-              message = MessageWithoutPoint.PRESENT;
-              break;
-          case FiltersScheme.FUTURE:
-              message = MessageWithoutPoint.FUTURE;
-              break;
-          default:
-              message = MessageWithoutPoint.EVERYTHING;
-      }
-
-      render(new ListEmpty(message), this.#contentBlock);
-      return;
-  }
-
     render(this.#pageTop, this.#pageTopBlock, RenderPosition.AFTERBEGIN);
     render(this.#sorting, this.#contentBlock);
     render(this.#routePointList, this.#contentBlock);
@@ -94,9 +72,17 @@ export default class Presenter {
     this.#filterModel.setFilter(filter);
   };
 
+  #clearEmptyMessage() {
+    const emptyMessageElement = this.#contentBlock.querySelector('.trip-events__msg');
+    if (emptyMessageElement) {
+      emptyMessageElement.remove();
+    }
+  }
+
   #handleFilterModelChange = () => {
     this.#currentSortType = 'day';
     this.#sorting.resetSortType();
+    this.#clearEmptyMessage();
     this.#updatePoints();
   };
 
@@ -119,7 +105,29 @@ export default class Presenter {
   #updatePoints() {
     const points = this.#getSortedPoints();
     this.#clearPoints();
-    this.#renderPoints(points);
+
+    if (points.length === 0) {
+      let message;
+      const currentFilter = this.#filterModel.filter;
+
+      switch (currentFilter) {
+        case FiltersScheme.PAST:
+          message = MessageWithoutPoint.PAST;
+          break;
+        case FiltersScheme.PRESENT:
+          message = MessageWithoutPoint.PRESENT;
+          break;
+        case FiltersScheme.FUTURE:
+          message = MessageWithoutPoint.FUTURE;
+          break;
+        default:
+          message = MessageWithoutPoint.EVERYTHING;
+      }
+
+      render(new ListEmpty(message), this.#contentBlock);
+    } else {
+      this.#renderPoints(points);
+    }
   }
 
   #getSortedPoints() {
@@ -165,8 +173,17 @@ export default class Presenter {
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
-  #handlePointChange = (updatedPoint) => {
-    this.#tripListModel.updatePoint(updatedPoint);
+  #handlePointChange = (updatedPoint, actionType) => {
+    switch (actionType) {
+      case UserAction.DELETE:
+        this.#tripListModel.deletePoint(updatedPoint.id);
+        break;
+      case UserAction.UPDATE:
+        this.#tripListModel.updatePoint(updatedPoint);
+        break;
+      default:
+        throw new Error(`Unknown action type: ${actionType}`);
+    }
     this.#updatePoints();
   };
 

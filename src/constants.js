@@ -53,4 +53,11 @@ const SORT_TYPES = [
   { type: 'offer', active: 'disabled' }
 ];
 
-export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES, FiltersScheme };
+const UserAction = {
+  DELETE: 'DELETE',
+  UPDATE: 'UPDATE',
+  ADD: 'ADD',
+};
+
+
+export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES, FiltersScheme, UserAction };

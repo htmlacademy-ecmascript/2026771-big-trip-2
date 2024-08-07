@@ -30,4 +30,8 @@ export default class TripListModel extends Observable {
       this._notify('update', this.#points);
     }
   }
+
+  deletePoint(pointId) {
+    this.#points = this.#points.filter(point => point.id !== pointId);
+  }
 }
