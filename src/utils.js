@@ -8,6 +8,7 @@ function getRandomNumber(MinPrice, MaxPrice) {
 }
 
 function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
+
   const start = new Date(dateFrom);
   const end = new Date(dateTo);
   const duration = end - start;
@@ -55,10 +56,10 @@ function countPointsByFilter(points) {
   const currentDate = new Date();
 
   return {
-    EVERYTHING: points.length,
-    FUTURE: points.filter((point) => new Date(point.dateFrom) > currentDate).length,
-    PRESENT: points.filter((point) => new Date(point.dateFrom) <= currentDate && new Date(point.dateTo) >= currentDate).length,
-    PAST: points.filter((point) => new Date(point.dateTo) < currentDate).length,
+    everething: points.length,
+    future: points.filter((point) => new Date(point.dateFrom) > currentDate).length,
+    present: points.filter((point) => new Date(point.dateFrom) <= currentDate && new Date(point.dateTo) >= currentDate).length,
+    past: points.filter((point) => new Date(point.dateTo) < currentDate).length,
   };
 }
 

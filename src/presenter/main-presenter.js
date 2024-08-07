@@ -1,4 +1,3 @@
-import { MessageWithoutPoint } from '../constants.js';
 import PageTop from '/src/view/page-top-view.js';
 import Sorting from '/src/view/list-sort-view.js';
 import RoutePointList from '/src/view/route-points-list-view.js';
@@ -6,36 +5,74 @@ import ListEmpty from '/src/view/list-empty-view.js';
 import { render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { calculateEventDuration } from '../utils.js';
+import FilterPresenter from './filters-presenter.js';
+import { MessageWithoutPoint, FiltersScheme } from '../constants.js';
 
 export default class Presenter {
+  #filterContentBlock;
   #contentBlock;
   #pageTopBlock;
   #tripListModel;
   #destinationsModel;
   #offersModel;
+  #filterModel;
   #pageTop = new PageTop();
   #routePointList = new RoutePointList();
   #pointPresenters = new Map();
   #currentSortType = 'day';
   #sorting = null;
+  #filterPresenter = null;
 
-  constructor({ ContentBlock, PageTopBlock, tripListModel, destinationsModel, offersModel }) {
+  constructor({ FilterContentBlock, ContentBlock, PageTopBlock, tripListModel, destinationsModel, offersModel, filterModel }) {
+    this.#filterContentBlock = FilterContentBlock;
     this.#contentBlock = ContentBlock;
     this.#pageTopBlock = PageTopBlock;
     this.#tripListModel = tripListModel;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
+    this.#filterModel = filterModel;
 
-    this.#sorting = new Sorting({ onSortTypeChange: this.#handleSortTypeChange });
+    this.#sorting = new Sorting({
+      onSortTypeChange: this.#handleSortTypeChange,
+      initialSortType: this.#currentSortType
+    });
+
+    this.#filterPresenter = new FilterPresenter({
+      filterContentBlock: this.#filterContentBlock,
+      tripListModel: this.#tripListModel,
+      filterModel: this.#filterModel,
+      onFilterChange: this.#handleFilterChange
+    });
+
+    this.#filterModel.addObserver(this.#handleFilterModelChange);
   }
 
   init() {
-    const points = this.#tripListModel.points;
+    this.#filterPresenter.init();
+
+    const points = this.#getFilteredPoints();
 
     if (points.length === 0) {
-      render(new ListEmpty(MessageWithoutPoint.EVERYTHING), this.#contentBlock);
+      let message;
+      const currentFilter = this.#filterModel.filter;
+
+      switch (currentFilter) {
+          case FiltersScheme.PAST:
+              message = MessageWithoutPoint.PAST;
+              break;
+          case FiltersScheme.PRESENT:
+              message = MessageWithoutPoint.PRESENT;
+              break;
+          case FiltersScheme.FUTURE:
+              message = MessageWithoutPoint.FUTURE;
+              break;
+          default:
+              message = MessageWithoutPoint.EVERYTHING;
+      }
+
+      render(new ListEmpty(message), this.#contentBlock);
       return;
-    }
+  }
 
     render(this.#pageTop, this.#pageTopBlock, RenderPosition.AFTERBEGIN);
     render(this.#sorting, this.#contentBlock);
@@ -53,15 +90,41 @@ export default class Presenter {
     this.#updatePoints();
   };
 
+  #handleFilterChange = (filter) => {
+    this.#filterModel.setFilter(filter);
+  };
+
+  #handleFilterModelChange = () => {
+    this.#currentSortType = 'day';
+    this.#sorting.resetSortType();
+    this.#updatePoints();
+  };
+
+  #getFilteredPoints() {
+    const points = [...this.#tripListModel.points];
+    const currentFilterType = this.#filterModel.filter;
+
+    switch (currentFilterType) {
+      case FiltersScheme.PAST:
+        return points.filter(point => new Date(point.dateTo) < new Date());
+      case FiltersScheme.PRESENT:
+        return points.filter(point => new Date(point.dateFrom) <= new Date() && new Date(point.dateTo) >= new Date());
+      case FiltersScheme.FUTURE:
+        return points.filter(point => new Date(point.dateFrom) > new Date());
+      default:
+        return points;
+    }
+  }
+
   #updatePoints() {
     const points = this.#getSortedPoints();
     this.#clearPoints();
     this.#renderPoints(points);
-
   }
 
   #getSortedPoints() {
-    const points = [...this.#tripListModel.points];
+    const points = [...this.#getFilteredPoints()];
+
     switch (this.#currentSortType) {
       case 'price':
         return points.sort((a, b) => b.basePrice - a.basePrice);
@@ -111,5 +174,7 @@ export default class Presenter {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 }
+
+
 
 
