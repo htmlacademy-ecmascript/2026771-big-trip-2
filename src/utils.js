@@ -8,6 +8,7 @@ function getRandomNumber(MinPrice, MaxPrice) {
 }
 
 function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
+
   const start = new Date(dateFrom);
   const end = new Date(dateTo);
   const duration = end - start;
@@ -36,13 +37,13 @@ function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
   return result.trim();
 }
 
-function formatDateToISOString(dateStr, customISOString) {
+function formatDateToISOString(dateStr) {
 
   const [day, month, yearAndTime] = dateStr.split('/');
   const [year, time] = yearAndTime.split(' ');
   const [hours, minutes] = time.split(':');
-  const timeZone = customISOString.slice(-4);
-  const isoDateStr = `20${year}-${month}-${day}T${hours}:${minutes}:00.${timeZone}`;
+  // const timeZone = customISOString.slice(-4);
+  const isoDateStr = `20${year}-${month}-${day}T${hours}:${minutes}:00.266Z`; // ВОПРОС, откуда брать часовой пояс если точка новая
   const date = new Date(isoDateStr);
   const formattedDateStr = date.toISOString();
 
@@ -55,10 +56,10 @@ function countPointsByFilter(points) {
   const currentDate = new Date();
 
   return {
-    EVERYTHING: points.length,
-    FUTURE: points.filter((point) => new Date(point.dateFrom) > currentDate).length,
-    PRESENT: points.filter((point) => new Date(point.dateFrom) <= currentDate && new Date(point.dateTo) >= currentDate).length,
-    PAST: points.filter((point) => new Date(point.dateTo) < currentDate).length,
+    everething: points.length,
+    future: points.filter((point) => new Date(point.dateFrom) > currentDate).length,
+    present: points.filter((point) => new Date(point.dateFrom) <= currentDate && new Date(point.dateTo) >= currentDate).length,
+    past: points.filter((point) => new Date(point.dateTo) < currentDate).length,
   };
 }
 

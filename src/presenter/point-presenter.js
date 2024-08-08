@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import RoutePoint from '/src/view/route-point-view.js';
 import EditPoint from '/src/view/edit-point-view.js';
 import { isEscape } from '../utils.js';
-import { Mode } from '../constants.js';
+import { Mode, UserAction } from '../constants.js';
 
 export default class PointPresenter {
   #routePointListElement;
@@ -11,38 +11,41 @@ export default class PointPresenter {
   #pointComponent;
   #pointEditComponent;
   #point;
-  #destinations;
-  #offers;
+  #destinationsModel;
+  #offersModel;
   #mode = Mode.DEFAULT;
-  #offerComponent;
-  #destinationComponent;
+  #presenter;
 
-  constructor({ routePointListElement, onDataChange, onModeChange }) {
+  constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange, presenter }) {
     this.#routePointListElement = routePointListElement;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
+    this.#presenter = presenter;
   }
 
-  init(point, destinations, offers) {
+  init(point) {
     this.#point = point;
-    this.#destinations = destinations;
-    this.#offers = offers;
+    const destinations = this.#destinationsModel.destinations;
+    const offers = this.#offersModel.offers;
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
 
     this.#pointComponent = new RoutePoint({
       point: this.#point,
-      destinations: this.#destinations,
-      offers: this.#offers,
+      destinations: destinations,
+      offers: offers,
       onEditClick: this.#handleEditClick,
-      onFavoriteClick: this.#handleFavoriteClick
+      onFavoriteClick: this.#handleFavoriteClick,
+      onDeleteClick: this.#handleDeleteClick,
     });
 
     this.#pointEditComponent = new EditPoint({
       point: this.#point,
-      destinations: this.#destinations,
-      offers: this.#offers,
+      destinations: destinations,
+      offers: offers,
       onFormSubmit: this.#handleFormSubmit,
       onRollupClick: this.#handleRollupClick
     });
@@ -85,18 +88,8 @@ export default class PointPresenter {
 
   #replaceFormToCard() {
     replace(this.#pointComponent, this.#pointEditComponent);
-    this.#removeOffersAndDestinations();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
-  }
-
-  #removeOffersAndDestinations() {
-    if (this.#offerComponent) {
-      remove(this.#offerComponent);
-    }
-    if (this.#destinationComponent) {
-      remove(this.#destinationComponent);
-    }
   }
 
   #escKeyDownHandler = (evt) => {
@@ -108,6 +101,9 @@ export default class PointPresenter {
   };
 
   #handleEditClick = () => {
+    if (this.#presenter.isCreatingNewPoint()) {
+      return;
+    }
     this.#replaceCardToForm();
   };
 
@@ -117,11 +113,20 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
+    this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite }, UserAction.UPDATE);
   };
 
   #handleFormSubmit = (updatedPoint) => {
-    this.#handleDataChange(updatedPoint);
+    if (updatedPoint === null) {
+      this.#handleDataChange(this.#point, UserAction.DELETE);
+    } else {
+      this.#handleDataChange(updatedPoint, UserAction.UPDATE);
+    }
     this.#replaceFormToCard();
   };
+
+  #handleDeleteClick = () => {
+    this.#handleFormSubmit(null);
+  };
 }
+

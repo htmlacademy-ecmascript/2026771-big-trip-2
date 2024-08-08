@@ -113,7 +113,7 @@ export default class EditPoint extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.element.querySelector('.event__save-btn').addEventListener('click', this.#formSubmitHandler);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formSubmitHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteClickHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollupClickHandler);
     this.element.querySelectorAll('.event__type-input').forEach((input) => input.addEventListener('change', this.#typeChangeHandler));
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationChangeHandler);
@@ -173,6 +173,11 @@ export default class EditPoint extends AbstractStatefulView {
     this._setState({
       basePrice: evt.target.value,
     });
+  };
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit(null);
   };
 
 

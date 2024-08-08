@@ -9,10 +9,10 @@ const Mode = {
 };
 
 const MessageWithoutPoint = {
-  EVERYTHING: 'Click New Event to create your first point',
-  PAST: 'There are no past events now',
-  PRESENT: 'There are no present events now',
-  FUTURE: 'There are no future events now',
+  'EVERYTHING': 'Click New Event to create your first point',
+  'PAST': 'There are no past events now',
+  'PRESENT': 'There are no present events now',
+  'FUTURE': 'There are no future events now',
 };
 
 const types = ['taxi', 'bus', 'train', 'flight', 'drive', 'check-in'];
@@ -37,8 +37,14 @@ const offersID = [
   'b4c3e4e6-9053-42ce-b747-e281314bab72'
 ];
 
-const FilterTypes = Object.keys(MessageWithoutPoint);
+const FiltersScheme = {
+  EVERYTHING: 'everything',
+  PAST: 'past',
+  PRESENT: 'present',
+  FUTURE: 'future'
+};
 
+const FilterTypes = Object.values(FiltersScheme);
 const SORT_TYPES = [
   { type: 'day', active: 'checked' },
   { type: 'event', active: 'disabled' },
@@ -47,4 +53,11 @@ const SORT_TYPES = [
   { type: 'offer', active: 'disabled' }
 ];
 
-export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES };
+const UserAction = {
+  DELETE: 'DELETE',
+  UPDATE: 'UPDATE',
+  ADD: 'ADD',
+};
+
+
+export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES, FiltersScheme, UserAction };
