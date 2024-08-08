@@ -7,6 +7,7 @@ export default class TripListModel extends Observable {
 
   init() {
     this.#points = Array.from({ length: POINT_COUNT }, getRandomPoint);
+    this._notify('update', this.#points);
   }
 
   get points() {
@@ -18,8 +19,13 @@ export default class TripListModel extends Observable {
     this._notify('update', this.#points);
   }
 
+  addPoint(point) {
+    this.#points = [point, ...this.#points];
+    this._notify('update', this.#points);
+  }
+
   updatePoint(updatedPoint) {
-    const index = this.#points.findIndex(point => point.id === updatedPoint.id);
+    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
 
     if (index !== -1) {
       this.#points = [
@@ -32,6 +38,7 @@ export default class TripListModel extends Observable {
   }
 
   deletePoint(pointId) {
-    this.#points = this.#points.filter(point => point.id !== pointId);
+    this.#points = this.#points.filter((point) => point.id !== pointId);
+    this._notify('update', this.#points);
   }
 }

@@ -2,11 +2,12 @@ import PageTop from '/src/view/page-top-view.js';
 import Sorting from '/src/view/list-sort-view.js';
 import RoutePointList from '/src/view/route-points-list-view.js';
 import ListEmpty from '/src/view/list-empty-view.js';
-import { render, RenderPosition } from '../framework/render.js';
+import { render, RenderPosition, remove } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
-import { calculateEventDuration } from '../utils.js';
+import { calculateEventDuration, isEscape } from '../utils.js';
 import FilterPresenter from './filters-presenter.js';
 import { MessageWithoutPoint, FiltersScheme, UserAction } from '../constants.js';
+import NewPointView from '/src/view/add-new-point-view.js';
 
 export default class Presenter {
   #filterContentBlock;
@@ -22,6 +23,9 @@ export default class Presenter {
   #currentSortType = 'day';
   #sorting = null;
   #filterPresenter = null;
+  #creatingPointComponent = null;
+  #newEventButton = null;
+  #isCreatingNewPoint = false;
 
   constructor({ FilterContentBlock, ContentBlock, PageTopBlock, tripListModel, destinationsModel, offersModel, filterModel }) {
     this.#filterContentBlock = FilterContentBlock;
@@ -50,14 +54,82 @@ export default class Presenter {
   init() {
     this.#filterPresenter.init();
 
-    const points = this.#getFilteredPoints();
-
     render(this.#pageTop, this.#pageTopBlock, RenderPosition.AFTERBEGIN);
     render(this.#sorting, this.#contentBlock);
     render(this.#routePointList, this.#contentBlock);
 
     this.#updatePoints();
+    this.#renderNewPointButton();
   }
+
+  isCreatingNewPoint() {
+    return this.#isCreatingNewPoint;
+  }
+
+  #renderNewPointButton() {
+    this.#newEventButton = document.querySelector('.trip-main__event-add-btn');
+    this.#newEventButton.addEventListener('click', this.#handleNewPointButtonClick);
+  }
+
+  #handleNewPointButtonClick = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    this.#filterModel.setFilter(FiltersScheme.EVERYTHING);
+    this.#currentSortType = 'day';
+    this.#sorting.resetSortType();
+
+    if (this.#creatingPointComponent) {
+      this.#creatingPointComponent.element.remove();
+      this.#creatingPointComponent = null;
+    }
+
+    const newPointBlock = document.querySelector('.trip-events__trip-sort');
+
+    const defaultType = 'flight';
+    const defaultOffers = this.#offersModel.offers.find((offer) => offer.type === 'flight').offers;
+    this.#creatingPointComponent = new NewPointView({
+      point: {
+        id: Date.now(),
+        type: defaultType,
+        offers: defaultOffers,
+        destination: null,
+        dateFrom: '',
+        dateTo: '',
+        basePrice: 0
+      },
+      destinations: this.#destinationsModel.destinations,
+      offers: this.#offersModel.offers,
+      onSave: this.#handleNewPointSave,
+      onCancel: this.#handleNewPointCancel,
+      onTypeChange: this.#handleTypeChange,
+    });
+
+    render(this.#creatingPointComponent, newPointBlock);
+    document.addEventListener('keydown', this.#escNewPointKeyDownHandler);
+    this.#newEventButton.disabled = true;
+    this.#isCreatingNewPoint = true;
+  };
+
+  #handleNewPointSave = (point) => {
+    this.#newEventButton.disabled = false;
+    this.#isCreatingNewPoint = false;
+    this.#tripListModel.addPoint(point);
+    this.#updatePoints();
+    remove(this.#creatingPointComponent);
+    document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
+  };
+
+  #escNewPointKeyDownHandler = (evt) => {
+    if (isEscape(evt)) {
+      this.#handleNewPointCancel();
+    }
+  };
+
+  #handleNewPointCancel = () => {
+    this.#newEventButton.disabled = false;
+    this.#isCreatingNewPoint = false;
+    remove(this.#creatingPointComponent);
+    document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
+  };
 
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
@@ -86,17 +158,32 @@ export default class Presenter {
     this.#updatePoints();
   };
 
+  #handleTypeChange = (newType) => {
+
+    const offerData = this.#offersModel.offers.find((offer) => offer.type === newType);
+
+    if (!offerData) {
+      return;
+    }
+
+    const updatedOffers = offerData.offers;
+
+    if (this.#creatingPointComponent) {
+      this.#creatingPointComponent.updateOffers(updatedOffers);
+    }
+  };
+
   #getFilteredPoints() {
     const points = [...this.#tripListModel.points];
     const currentFilterType = this.#filterModel.filter;
 
     switch (currentFilterType) {
       case FiltersScheme.PAST:
-        return points.filter(point => new Date(point.dateTo) < new Date());
+        return points.filter((point) => new Date(point.dateTo) < new Date());
       case FiltersScheme.PRESENT:
-        return points.filter(point => new Date(point.dateFrom) <= new Date() && new Date(point.dateTo) >= new Date());
+        return points.filter((point) => new Date(point.dateFrom) <= new Date() && new Date(point.dateTo) >= new Date());
       case FiltersScheme.FUTURE:
-        return points.filter(point => new Date(point.dateFrom) > new Date());
+        return points.filter((point) => new Date(point.dateFrom) > new Date());
       default:
         return points;
     }
@@ -162,11 +249,11 @@ export default class Presenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       routePointListElement: this.#routePointList.element,
-      tripListModel: this.#tripListModel,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
       onDataChange: this.#handlePointChange,
-      onModeChange: this.#handleModeChange
+      onModeChange: this.#handleModeChange,
+      presenter: this
     });
 
     pointPresenter.init(point);
@@ -180,6 +267,9 @@ export default class Presenter {
         break;
       case UserAction.UPDATE:
         this.#tripListModel.updatePoint(updatedPoint);
+        break;
+      case UserAction.ADD:
+        this.#tripListModel.addPoint(updatedPoint);
         break;
       default:
         throw new Error(`Unknown action type: ${actionType}`);

@@ -14,13 +14,15 @@ export default class PointPresenter {
   #destinationsModel;
   #offersModel;
   #mode = Mode.DEFAULT;
+  #presenter;
 
-  constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange }) {
+  constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange, presenter }) {
     this.#routePointListElement = routePointListElement;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
+    this.#presenter = presenter;
   }
 
   init(point) {
@@ -99,6 +101,9 @@ export default class PointPresenter {
   };
 
   #handleEditClick = () => {
+    if (this.#presenter.isCreatingNewPoint()) {
+      return;
+    }
     this.#replaceCardToForm();
   };
 
