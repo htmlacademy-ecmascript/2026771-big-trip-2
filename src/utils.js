@@ -37,7 +37,7 @@ function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
   return result.trim();
 }
 
-function formatDateToISOString(dateStr, customISOString) {
+function formatDateToISOString(dateStr) {
 
   const [day, month, yearAndTime] = dateStr.split('/');
   const [year, time] = yearAndTime.split(' ');

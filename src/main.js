@@ -1,4 +1,3 @@
-import { render } from './framework/render.js';
 import Presenter from './presenter/main-presenter.js';
 import TripListModel from './model/trip-list-model.js';
 import DestinationsModel from './model/destinations-model.js';

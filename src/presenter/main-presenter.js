@@ -281,7 +281,3 @@ export default class Presenter {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 }
-
-
-
-
