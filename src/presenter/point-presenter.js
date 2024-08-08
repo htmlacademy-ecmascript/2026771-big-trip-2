@@ -15,14 +15,16 @@ export default class PointPresenter {
   #offersModel;
   #mode = Mode.DEFAULT;
   #presenter;
+  #onNewPointCancel
 
-  constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange, presenter }) {
+  constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange, presenter,  onNewPointCancel }) {
     this.#routePointListElement = routePointListElement;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
     this.#presenter = presenter;
+    this.#onNewPointCancel = onNewPointCancel;
   }
 
   init(point) {
@@ -80,6 +82,9 @@ export default class PointPresenter {
   }
 
   #replaceCardToForm() {
+    if (this.#onNewPointCancel) {
+      this.#onNewPointCancel();
+    }
     replace(this.#pointEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
@@ -101,9 +106,6 @@ export default class PointPresenter {
   };
 
   #handleEditClick = () => {
-    if (this.#presenter.isCreatingNewPoint()) {
-      return;
-    }
     this.#replaceCardToForm();
   };
 

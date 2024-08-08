@@ -253,7 +253,8 @@ export default class Presenter {
       offersModel: this.#offersModel,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange,
-      presenter: this
+      presenter: this,
+      onNewPointCancel: this.#handleNewPointCancel
     });
 
     pointPresenter.init(point);

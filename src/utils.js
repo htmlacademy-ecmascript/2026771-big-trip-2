@@ -42,8 +42,8 @@ function formatDateToISOString(dateStr) {
   const [day, month, yearAndTime] = dateStr.split('/');
   const [year, time] = yearAndTime.split(' ');
   const [hours, minutes] = time.split(':');
-  // const timeZone = customISOString.slice(-4);
-  const isoDateStr = `20${year}-${month}-${day}T${hours}:${minutes}:00.266Z`; // ВОПРОС, откуда брать часовой пояс если точка новая
+  const timeZone = new Date().toISOString().toString().slice(-4);
+  const isoDateStr = `20${year}-${month}-${day}T${hours}:${minutes}:00.${timeZone}`;
   const date = new Date(isoDateStr);
   const formattedDateStr = date.toISOString();
 
