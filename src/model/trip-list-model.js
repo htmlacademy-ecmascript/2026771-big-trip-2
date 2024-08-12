@@ -1,13 +1,23 @@
 import Observable from '../framework/observable.js';
-import { POINT_COUNT } from '../constants.js';
-import { getRandomPoint } from '../mocks/route-point-mock.js';
 
 export default class TripListModel extends Observable {
   #points = [];
+  #apiService = null;
 
-  init() {
-    this.#points = Array.from({ length: POINT_COUNT }, getRandomPoint);
-    this._notify('update', this.#points);
+  constructor({ apiService }) {
+    super();
+    this.#apiService = apiService;
+  }
+
+  async init() {
+    try {
+      this.#points = await this.#apiService.points;
+      this._notify('update', this.#points);
+    } catch (err) {
+
+      this.#points = [];
+      this._notify('update', this.#points);
+    }
   }
 
   get points() {
@@ -24,16 +34,17 @@ export default class TripListModel extends Observable {
     this._notify('update', this.#points);
   }
 
-  updatePoint(updatedPoint) {
-    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
+  async updatePoint(updatedPoint) {
+    try {
+      const response = await this.#apiService.updatePoint(updatedPoint);
+      const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
 
-    if (index !== -1) {
-      this.#points = [
-        ...this.#points.slice(0, index),
-        updatedPoint,
-        ...this.#points.slice(index + 1)
-      ];
-      this._notify('update', this.#points);
+      if (index !== -1) {
+        this.#points[index] = response;
+        this._notify('update', response);
+      }
+    } catch (error) {
+      throw new Error('False update point');
     }
   }
 

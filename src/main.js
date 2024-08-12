@@ -3,14 +3,18 @@ import TripListModel from './model/trip-list-model.js';
 import DestinationsModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
 import FilterModel from './model/filters-model.js';
+import { AUTORISE, SERVER_URL } from './constants.js';
+import PointsApiService from './api-service.js';
 
-const tripListModel = new TripListModel();
+const pointApiservice = new PointsApiService(SERVER_URL, AUTORISE);
+
+const tripListModel = new TripListModel({apiService: pointApiservice});
 tripListModel.init();
 
-const destinationsModel = new DestinationsModel();
+const destinationsModel = new DestinationsModel({apiService: pointApiservice});
 destinationsModel.init();
 
-const offersModel = new OffersModel();
+const offersModel = new OffersModel({apiService: pointApiservice});
 offersModel.init();
 
 const filterModel = new FilterModel();

@@ -1,5 +1,3 @@
-const POINT_COUNT = 10;
-
 const MaxPrice = 2000;
 const MinPrice = 15;
 
@@ -59,5 +57,15 @@ const UserAction = {
   ADD: 'ADD',
 };
 
+const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE'
+};
 
-export { POINT_COUNT, MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES, FiltersScheme, UserAction };
+const SERVER_URL = 'https://22.objects.htmlacademy.pro/big-trip';
+
+const AUTORISE = 'Basic 0000';
+
+export { MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES, FiltersScheme, UserAction, Method, SERVER_URL, AUTORISE };

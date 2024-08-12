@@ -51,14 +51,25 @@ export default class Presenter {
     this.#filterModel.addObserver(this.#handleFilterModelChange);
   }
 
-  init() {
+  async init() {
     this.#filterPresenter.init();
 
     render(this.#pageTop, this.#pageTopBlock, RenderPosition.AFTERBEGIN);
     render(this.#sorting, this.#contentBlock);
     render(this.#routePointList, this.#contentBlock);
 
-    this.#updatePoints();
+    try {
+      await Promise.all([
+        this.#tripListModel.init(),
+        this.#destinationsModel.init(),
+        this.#offersModel.init(),
+      ]);
+
+      this.#updatePoints();
+    } catch (error) {
+      throw new Error('Ошибка загрузки');
+    }
+
     this.#renderNewPointButton();
   }
 
@@ -72,7 +83,7 @@ export default class Presenter {
   }
 
   #handleNewPointButtonClick = () => {
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    this.#handleModeChange();
     this.#filterModel.setFilter(FiltersScheme.EVERYTHING);
     this.#currentSortType = 'day';
     this.#sorting.resetSortType();
@@ -253,7 +264,6 @@ export default class Presenter {
       offersModel: this.#offersModel,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange,
-      presenter: this,
       onNewPointCancel: this.#handleNewPointCancel
     });
 

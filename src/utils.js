@@ -54,7 +54,6 @@ const isEscape = (evt) => evt.key === 'Escape';
 
 function countPointsByFilter(points) {
   const currentDate = new Date();
-
   return {
     everething: points.length,
     future: points.filter((point) => new Date(point.dateFrom) > currentDate).length,
