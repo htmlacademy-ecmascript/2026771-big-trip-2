@@ -59,7 +59,7 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-${pointId}" type="number" name="event-price" value="${basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -127,10 +127,11 @@ export default class EditPoint extends AbstractStatefulView {
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'))
       .map((checkbox) => checkbox.id);
+    const timeZone = (this._state.dateFrom.toString().slice(-4));
 
     this.updateElement({
-      dateFrom: formatDateToISOString(startDateInput, this._state.dateTo),
-      dateTo: formatDateToISOString(endDateInput, this._state.dateFrom),
+      dateFrom: formatDateToISOString(startDateInput, timeZone),
+      dateTo: formatDateToISOString(endDateInput, timeZone),
       offers: selectedOffers,
     });
     this.#handleFormSubmit(EditPoint.parseStateToPoint(this._state));

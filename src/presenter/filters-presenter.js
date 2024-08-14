@@ -14,7 +14,6 @@ export default class FilterPresenter {
     this.#tripListModel = tripListModel;
     this.#onFilterChange = onFilterChange;
     this.#filterModel.addObserver(this.#handleModelEvent.bind(this));
-    this.init();
   }
 
   async init() {

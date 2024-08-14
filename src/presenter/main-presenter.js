@@ -49,18 +49,17 @@ export default class Presenter {
     });
 
     this.#filterModel.addObserver(this.#handleFilterModelChange);
+    this.#tripListModel.addObserver(() => this.#updatePoints());
   }
 
   async init() {
-    this.#filterPresenter.init();
-
     render(this.#pageTop, this.#pageTopBlock, RenderPosition.AFTERBEGIN);
     render(this.#sorting, this.#contentBlock);
     render(this.#routePointList, this.#contentBlock);
 
     try {
       await Promise.all([
-        this.#tripListModel.init(),
+        this.#filterPresenter.init(),
         this.#destinationsModel.init(),
         this.#offersModel.init(),
       ]);
@@ -99,7 +98,7 @@ export default class Presenter {
     const defaultOffers = this.#offersModel.offers.find((offer) => offer.type === 'flight').offers;
     this.#creatingPointComponent = new NewPointView({
       point: {
-        id: Date.now(),
+        isFavorite: false,
         type: defaultType,
         offers: defaultOffers,
         destination: null,
@@ -120,11 +119,16 @@ export default class Presenter {
     this.#isCreatingNewPoint = true;
   };
 
-  #handleNewPointSave = (point) => {
+  #handleNewPointSave = async (point) => {
     this.#newEventButton.disabled = false;
     this.#isCreatingNewPoint = false;
-    this.#tripListModel.addPoint(point);
-    this.#updatePoints();
+
+    try {
+      await this.#tripListModel.addPoint(point);
+      this.#updatePoints();
+    } catch (error) {
+      throw new Error('Ошибка сохранения точки');
+    }
     remove(this.#creatingPointComponent);
     document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
   };

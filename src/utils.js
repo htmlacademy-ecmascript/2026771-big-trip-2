@@ -37,12 +37,10 @@ function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
   return result.trim();
 }
 
-function formatDateToISOString(dateStr) {
-
+function formatDateToISOString(dateStr, timeZone) {
   const [day, month, yearAndTime] = dateStr.split('/');
   const [year, time] = yearAndTime.split(' ');
   const [hours, minutes] = time.split(':');
-  const timeZone = new Date().toISOString().toString().slice(-4);
   const isoDateStr = `20${year}-${month}-${day}T${hours}:${minutes}:00.${timeZone}`;
   const date = new Date(isoDateStr);
   const formattedDateStr = date.toISOString();

@@ -7,17 +7,10 @@ import { AUTORISE, SERVER_URL } from './constants.js';
 import PointsApiService from './api-service.js';
 
 const pointApiservice = new PointsApiService(SERVER_URL, AUTORISE);
-
 const tripListModel = new TripListModel({apiService: pointApiservice});
-tripListModel.init();
-
-const destinationsModel = new DestinationsModel({apiService: pointApiservice});
-destinationsModel.init();
-
-const offersModel = new OffersModel({apiService: pointApiservice});
-offersModel.init();
-
 const filterModel = new FilterModel();
+const destinationsModel = new DestinationsModel({apiService: pointApiservice});
+const offersModel = new OffersModel({apiService: pointApiservice});
 
 const sectionContentElement = document.querySelector('.trip-events');
 const newPageTopElement = document.querySelector('.trip-main');

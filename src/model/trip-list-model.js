@@ -12,7 +12,6 @@ export default class TripListModel extends Observable {
   async init() {
     try {
       this.#points = await this.#apiService.points;
-      this._notify('update', this.#points);
     } catch (err) {
 
       this.#points = [];
@@ -29,9 +28,14 @@ export default class TripListModel extends Observable {
     this._notify('update', this.#points);
   }
 
-  addPoint(point) {
-    this.#points = [point, ...this.#points];
-    this._notify('update', this.#points);
+  async addPoint(point) {
+    try {
+      const response = await this.#apiService.addPoint(point);
+      this.#points = [response, ...this.#points];
+      this._notify('update', this.#points);
+    } catch (error) {
+      throw new Error('Ошибка добавления точки');
+    }
   }
 
   async updatePoint(updatedPoint) {
@@ -41,15 +45,20 @@ export default class TripListModel extends Observable {
 
       if (index !== -1) {
         this.#points[index] = response;
-        this._notify('update', response);
+        this._notify('update', this.#points);
       }
     } catch (error) {
-      throw new Error('False update point');
+      throw new Error('Ошибка обновления точки');
     }
   }
 
-  deletePoint(pointId) {
-    this.#points = this.#points.filter((point) => point.id !== pointId);
-    this._notify('update', this.#points);
+  async deletePoint(pointId) {
+    try {
+      await this.#apiService.deletePoint(pointId);
+      this.#points = this.#points.filter((point) => point.id !== pointId);
+      this._notify('update', this.#points);
+    } catch (error) {
+      throw new Error('Ошибка удаления точки');
+    }
   }
 }

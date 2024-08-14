@@ -124,7 +124,6 @@ export default class PointPresenter {
       } else {
         await this.#handleDataChange(updatedPoint, UserAction.UPDATE);
       }
-      this.#replaceFormToCard();
     } catch (error) {
       throw new Error('False update point');
     }

@@ -111,11 +111,12 @@ export default class NewPointView extends AbstractView {
     const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked')).map((checkbox) => checkbox.id);
+    const timeZone = (new Date().toISOString().slice(-4));
 
     const updatedPoint = {
       ...this.#point,
-      dateFrom: formatDateToISOString(startDateInput, this.#point.dateTo),
-      dateTo: formatDateToISOString(endDateInput, this.#point.dateFrom),
+      dateFrom: formatDateToISOString(startDateInput, timeZone),
+      dateTo: formatDateToISOString(endDateInput, timeZone),
       offers: selectedOffers,
       basePrice: parseInt(this.element.querySelector('.event__input--price').value, 10) || 0
     };
@@ -146,8 +147,6 @@ export default class NewPointView extends AbstractView {
     this.#point = {
       ...this.#point,
       destination: destination.id,
-      description: destination.description,
-      photos: destination.photos,
     };
     this.element.innerHTML = this.template;
     this._restoreHandlers();
@@ -169,8 +168,8 @@ export default class NewPointView extends AbstractView {
   };
 
   #initFlatpickr() {
-    const startTimeInput = this.element.querySelector(`#event-start-time-${this.#point.id}`);
-    const endTimeInput = this.element.querySelector(`#event-end-time-${this.#point.id}`);
+    const startTimeInput = this.element.querySelector('.event__input--time[name="event-start-time"]');
+    const endTimeInput = this.element.querySelector('.event__input--time[name="event-end-time"]');
 
     if (!startTimeInput || !endTimeInput) {
       return;
