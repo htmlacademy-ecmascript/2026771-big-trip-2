@@ -1,13 +1,21 @@
 import Observable from '../framework/observable.js';
-import {offersMock} from '../mocks/offers-mock.js';
 
-export default class OfferstModel extends Observable {
-
+export default class OffersModel extends Observable {
   #offers = [];
+  #apiService = null;
 
-  init() {
-    this.#offers = offersMock;
+  constructor({ apiService }) {
+    super();
+    this.#apiService = apiService;
+  }
 
+  async init() {
+    try {
+      this.#offers = await this.#apiService.offers;
+      this._notify('update', this.#offers);
+    } catch (err) {
+      throw new Error('False load offers');
+    }
   }
 
   get offers() {

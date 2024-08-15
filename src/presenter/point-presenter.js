@@ -14,15 +14,15 @@ export default class PointPresenter {
   #destinationsModel;
   #offersModel;
   #mode = Mode.DEFAULT;
-  #presenter;
+  #onNewPointCancel;
 
-  constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange, presenter }) {
+  constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange, onNewPointCancel }) {
     this.#routePointListElement = routePointListElement;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
-    this.#presenter = presenter;
+    this.#onNewPointCancel = onNewPointCancel;
   }
 
   init(point) {
@@ -80,6 +80,9 @@ export default class PointPresenter {
   }
 
   #replaceCardToForm() {
+    if (this.#onNewPointCancel) {
+      this.#onNewPointCancel();
+    }
     replace(this.#pointEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
@@ -101,9 +104,6 @@ export default class PointPresenter {
   };
 
   #handleEditClick = () => {
-    if (this.#presenter.isCreatingNewPoint()) {
-      return;
-    }
     this.#replaceCardToForm();
   };
 
@@ -116,13 +116,17 @@ export default class PointPresenter {
     this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite }, UserAction.UPDATE);
   };
 
-  #handleFormSubmit = (updatedPoint) => {
-    if (updatedPoint === null) {
-      this.#handleDataChange(this.#point, UserAction.DELETE);
-    } else {
-      this.#handleDataChange(updatedPoint, UserAction.UPDATE);
+  #handleFormSubmit = async (updatedPoint) => {
+
+    try {
+      if (updatedPoint === null) {
+        await this.#handleDataChange(this.#point, UserAction.DELETE);
+      } else {
+        await this.#handleDataChange(updatedPoint, UserAction.UPDATE);
+      }
+    } catch (error) {
+      throw new Error('False update point');
     }
-    this.#replaceFormToCard();
   };
 
   #handleDeleteClick = () => {

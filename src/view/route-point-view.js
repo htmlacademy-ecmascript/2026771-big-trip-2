@@ -29,9 +29,9 @@ function createRoutePointTemplate(point, destinations, offers) {
       <h3 class="event__title">${type} ${pointDestination?.name || ''}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${dateFrom}">${new Date(dateFrom).getUTCHours().toString().padStart(2, '0')}:${new Date(dateFrom).getUTCMinutes().toString().padStart(2, '0')}</time>
+          <time class="event__start-time" datetime="${dateFrom}">${dateFrom.slice(11, 16)}</time>
           &mdash;
-          <time class="event__end-time" datetime="${dateTo}">${new Date(dateTo).getUTCHours().toString().padStart(2, '0')}:${new Date(dateTo).getUTCMinutes().toString().padStart(2, '0')}</time>
+          <time class="event__end-time" datetime="${dateTo}">${dateTo.slice(11, 16)}</time>
         </p>
         <p class="event__duration">${calculateEventDuration(dateFrom, dateTo)}</p>
       </div>

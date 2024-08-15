@@ -49,16 +49,26 @@ export default class Presenter {
     });
 
     this.#filterModel.addObserver(this.#handleFilterModelChange);
+    this.#tripListModel.addObserver(() => this.#updatePoints());
   }
 
-  init() {
-    this.#filterPresenter.init();
-
+  async init() {
     render(this.#pageTop, this.#pageTopBlock, RenderPosition.AFTERBEGIN);
     render(this.#sorting, this.#contentBlock);
     render(this.#routePointList, this.#contentBlock);
 
-    this.#updatePoints();
+    try {
+      await Promise.all([
+        this.#filterPresenter.init(),
+        this.#destinationsModel.init(),
+        this.#offersModel.init(),
+      ]);
+
+      this.#updatePoints();
+    } catch (error) {
+      throw new Error('Ошибка загрузки');
+    }
+
     this.#renderNewPointButton();
   }
 
@@ -72,7 +82,7 @@ export default class Presenter {
   }
 
   #handleNewPointButtonClick = () => {
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    this.#handleModeChange();
     this.#filterModel.setFilter(FiltersScheme.EVERYTHING);
     this.#currentSortType = 'day';
     this.#sorting.resetSortType();
@@ -88,7 +98,7 @@ export default class Presenter {
     const defaultOffers = this.#offersModel.offers.find((offer) => offer.type === 'flight').offers;
     this.#creatingPointComponent = new NewPointView({
       point: {
-        id: Date.now(),
+        isFavorite: false,
         type: defaultType,
         offers: defaultOffers,
         destination: null,
@@ -109,11 +119,16 @@ export default class Presenter {
     this.#isCreatingNewPoint = true;
   };
 
-  #handleNewPointSave = (point) => {
+  #handleNewPointSave = async (point) => {
     this.#newEventButton.disabled = false;
     this.#isCreatingNewPoint = false;
-    this.#tripListModel.addPoint(point);
-    this.#updatePoints();
+
+    try {
+      await this.#tripListModel.addPoint(point);
+      this.#updatePoints();
+    } catch (error) {
+      throw new Error('Ошибка сохранения точки');
+    }
     remove(this.#creatingPointComponent);
     document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
   };
@@ -253,7 +268,7 @@ export default class Presenter {
       offersModel: this.#offersModel,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange,
-      presenter: this
+      onNewPointCancel: this.#handleNewPointCancel
     });
 
     pointPresenter.init(point);

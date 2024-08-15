@@ -37,13 +37,11 @@ function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
   return result.trim();
 }
 
-function formatDateToISOString(dateStr) {
-
+function formatDateToISOString(dateStr, timeZone) {
   const [day, month, yearAndTime] = dateStr.split('/');
   const [year, time] = yearAndTime.split(' ');
   const [hours, minutes] = time.split(':');
-  // const timeZone = customISOString.slice(-4);
-  const isoDateStr = `20${year}-${month}-${day}T${hours}:${minutes}:00.266Z`; // ВОПРОС, откуда брать часовой пояс если точка новая
+  const isoDateStr = `20${year}-${month}-${day}T${hours}:${minutes}:00.${timeZone}`;
   const date = new Date(isoDateStr);
   const formattedDateStr = date.toISOString();
 
@@ -54,7 +52,6 @@ const isEscape = (evt) => evt.key === 'Escape';
 
 function countPointsByFilter(points) {
   const currentDate = new Date();
-
   return {
     everething: points.length,
     future: points.filter((point) => new Date(point.dateFrom) > currentDate).length,

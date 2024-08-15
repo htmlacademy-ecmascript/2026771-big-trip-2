@@ -3,17 +3,14 @@ import TripListModel from './model/trip-list-model.js';
 import DestinationsModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
 import FilterModel from './model/filters-model.js';
+import { AUTORISE, SERVER_URL } from './constants.js';
+import PointsApiService from './api-service.js';
 
-const tripListModel = new TripListModel();
-tripListModel.init();
-
-const destinationsModel = new DestinationsModel();
-destinationsModel.init();
-
-const offersModel = new OffersModel();
-offersModel.init();
-
+const pointApiservice = new PointsApiService(SERVER_URL, AUTORISE);
+const tripListModel = new TripListModel({apiService: pointApiservice});
 const filterModel = new FilterModel();
+const destinationsModel = new DestinationsModel({apiService: pointApiservice});
+const offersModel = new OffersModel({apiService: pointApiservice});
 
 const sectionContentElement = document.querySelector('.trip-events');
 const newPageTopElement = document.querySelector('.trip-main');

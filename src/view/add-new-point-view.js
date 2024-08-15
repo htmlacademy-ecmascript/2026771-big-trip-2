@@ -40,7 +40,7 @@ function createNewPointTemplate(point, destinations, destinationTemplate, offerT
           <label class="event__label  event__type-output" for="event-destination-${pointId}">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${name !== undefined && name !== null ? name : ''}" list="destination-list-${pointId}">
+          <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${name || ''}" list="destination-list-${pointId}">
           <datalist id="destination-list-${pointId}">
           ${destinations.map((destination) => `<option value="${destination.name}"></option>`).join('')}
           </datalist>
@@ -61,8 +61,6 @@ function createNewPointTemplate(point, destinations, destinationTemplate, offerT
         </div>
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
-          <span class="visually-hidden">Open event</span>
-        </button>
       </header>
 
       <section class="event__details">
@@ -113,12 +111,14 @@ export default class NewPointView extends AbstractView {
     const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked')).map((checkbox) => checkbox.id);
+    const timeZone = (new Date().toISOString().slice(-4));
 
     const updatedPoint = {
       ...this.#point,
-      dateFrom: formatDateToISOString(startDateInput, this.#point.dateTo),
-      dateTo: formatDateToISOString(endDateInput, this.#point.dateFrom),
+      dateFrom: formatDateToISOString(startDateInput, timeZone),
+      dateTo: formatDateToISOString(endDateInput, timeZone),
       offers: selectedOffers,
+      basePrice: parseInt(this.element.querySelector('.event__input--price').value, 10) || 0
     };
 
     this.#handleFormSubmit(updatedPoint);
@@ -147,30 +147,29 @@ export default class NewPointView extends AbstractView {
     this.#point = {
       ...this.#point,
       destination: destination.id,
-      description: destination.description,
-      photos: destination.photos,
     };
     this.element.innerHTML = this.template;
     this._restoreHandlers();
     this.#initFlatpickr();
-
   };
 
   #priceInputHandler = (evt) => {
     this.#point = {
       ...this.#point,
-      basePrice: evt.target.value,
+      basePrice: parseInt(evt.target.value, 10) || 0,
     };
   };
 
   #deleteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormCancel();
+    if (this.#handleFormCancel) {
+      this.#handleFormCancel();
+    }
   };
 
   #initFlatpickr() {
-    const startTimeInput = this.element.querySelector(`#event-start-time-${this.#point.id}`);
-    const endTimeInput = this.element.querySelector(`#event-end-time-${this.#point.id}`);
+    const startTimeInput = this.element.querySelector('.event__input--time[name="event-start-time"]');
+    const endTimeInput = this.element.querySelector('.event__input--time[name="event-end-time"]');
 
     if (!startTimeInput || !endTimeInput) {
       return;

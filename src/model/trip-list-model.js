@@ -1,13 +1,22 @@
 import Observable from '../framework/observable.js';
-import { POINT_COUNT } from '../constants.js';
-import { getRandomPoint } from '../mocks/route-point-mock.js';
 
 export default class TripListModel extends Observable {
   #points = [];
+  #apiService = null;
 
-  init() {
-    this.#points = Array.from({ length: POINT_COUNT }, getRandomPoint);
-    this._notify('update', this.#points);
+  constructor({ apiService }) {
+    super();
+    this.#apiService = apiService;
+  }
+
+  async init() {
+    try {
+      this.#points = await this.#apiService.points;
+    } catch (err) {
+
+      this.#points = [];
+      this._notify('update', this.#points);
+    }
   }
 
   get points() {
@@ -19,26 +28,37 @@ export default class TripListModel extends Observable {
     this._notify('update', this.#points);
   }
 
-  addPoint(point) {
-    this.#points = [point, ...this.#points];
-    this._notify('update', this.#points);
-  }
-
-  updatePoint(updatedPoint) {
-    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
-
-    if (index !== -1) {
-      this.#points = [
-        ...this.#points.slice(0, index),
-        updatedPoint,
-        ...this.#points.slice(index + 1)
-      ];
+  async addPoint(point) {
+    try {
+      const response = await this.#apiService.addPoint(point);
+      this.#points = [response, ...this.#points];
       this._notify('update', this.#points);
+    } catch (error) {
+      throw new Error('Ошибка добавления точки');
     }
   }
 
-  deletePoint(pointId) {
-    this.#points = this.#points.filter((point) => point.id !== pointId);
-    this._notify('update', this.#points);
+  async updatePoint(updatedPoint) {
+    try {
+      const response = await this.#apiService.updatePoint(updatedPoint);
+      const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
+
+      if (index !== -1) {
+        this.#points[index] = response;
+        this._notify('update', this.#points);
+      }
+    } catch (error) {
+      throw new Error('Ошибка обновления точки');
+    }
+  }
+
+  async deletePoint(pointId) {
+    try {
+      await this.#apiService.deletePoint(pointId);
+      this.#points = this.#points.filter((point) => point.id !== pointId);
+      this._notify('update', this.#points);
+    } catch (error) {
+      throw new Error('Ошибка удаления точки');
+    }
   }
 }
