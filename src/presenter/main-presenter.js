@@ -229,6 +229,7 @@ export default class Presenter {
       render(new ListEmpty(message), this.#contentBlock);
     } else {
       this.#renderPoints(points);
+      this.#updatePageTop();
     }
   }
 
@@ -273,6 +274,50 @@ export default class Presenter {
 
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
+  }
+
+  #updatePageTop() {
+    const points = this.#getFilteredPoints();
+
+    if (points.length === 0) {
+      this.#pageTop.update({ title: '', dates: '', cost: 0 });
+      return;
+    }
+
+    const sortedPoints = this.#getSortedPoints();
+    const firstPoint = sortedPoints[0];
+    const lastPoint = sortedPoints[sortedPoints.length - 1];
+    const title = this.#generateTitle(sortedPoints);
+    const dates = `${new Date(firstPoint.dateFrom).toLocaleDateString('en-US', {day: '2-digit',month: 'short'}).toUpperCase()} — ${new Date(lastPoint.dateTo).toLocaleDateString('en-US', {day: '2-digit',month: 'short'}).toUpperCase()}`;
+    const cost = this.#calculateTotalCost(sortedPoints);
+    this.#pageTop.update({ title, dates, cost });
+  }
+
+  #generateTitle(points) {
+
+    const cities = points.map(point => {
+      const destination = this.#destinationsModel.destinations.find(dest => dest.id === point.destination);
+      return destination ? destination.name : '';
+    });
+    if (cities.length <= 3) {
+      return cities.join(' — ');
+    }
+    return `${cities[0]} —...— ${cities[cities.length - 1]}`;
+  }
+
+  #findOfferByTypeAndId(type, id) {
+    const typeOffers = this.#offersModel.offers.find(offerGroup => offerGroup.type === type);
+    return typeOffers.offers.find(offer => offer.id === id);
+  }
+
+  #calculateTotalCost(points) {
+    return points.reduce((total, point) => {
+      const offersCost = point.offers.reduce((sum, offer) => {
+        const foundOffer = this.#findOfferByTypeAndId(point.type, offer);
+        return sum + (foundOffer ? foundOffer.price : 0);
+      }, 0);
+      return total + point.basePrice + offersCost;
+    }, 0);
   }
 
   #handlePointChange = (updatedPoint, actionType) => {
