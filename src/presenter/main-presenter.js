@@ -8,6 +8,8 @@ import { calculateEventDuration, isEscape } from '../utils.js';
 import FilterPresenter from './filters-presenter.js';
 import { MessageWithoutPoint, FiltersScheme, UserAction } from '../constants.js';
 import NewPointView from '/src/view/add-new-point-view.js';
+import Loading from '/src/view/loading-view.js';
+import FailedLoadData from '/src/view/failed-load-data-view.js';
 
 export default class Presenter {
   #filterContentBlock;
@@ -26,6 +28,7 @@ export default class Presenter {
   #creatingPointComponent = null;
   #newEventButton = null;
   #isCreatingNewPoint = false;
+  #isDataLoadingError = false;
 
   constructor({ FilterContentBlock, ContentBlock, PageTopBlock, tripListModel, destinationsModel, offersModel, filterModel }) {
     this.#filterContentBlock = FilterContentBlock;
@@ -57,19 +60,27 @@ export default class Presenter {
     render(this.#sorting, this.#contentBlock);
     render(this.#routePointList, this.#contentBlock);
 
+    const loadingComponent = new Loading();
+    render(loadingComponent, this.#contentBlock);
+
     try {
+      this.#isDataLoadingError = false;
       await Promise.all([
-        this.#filterPresenter.init(),
+        this.#filterPresenter.init().finally(() => {
+          remove(loadingComponent);
+          this.#renderNewPointButton();
+        }),
         this.#destinationsModel.init(),
         this.#offersModel.init(),
       ]);
 
       this.#updatePoints();
     } catch (error) {
+      this.#isDataLoadingError = true;
+      this.#updatePoints();
+      render(new FailedLoadData(), this.#contentBlock);
       throw new Error('Ошибка загрузки');
     }
-
-    this.#renderNewPointButton();
   }
 
   isCreatingNewPoint() {
@@ -120,17 +131,20 @@ export default class Presenter {
   };
 
   #handleNewPointSave = async (point) => {
-    this.#newEventButton.disabled = false;
-    this.#isCreatingNewPoint = false;
+    this.#creatingPointComponent.updateButtonText('Saving...');
 
     try {
       await this.#tripListModel.addPoint(point);
       this.#updatePoints();
+      this.#creatingPointComponent.updateButtonText('Save');
+      remove(this.#creatingPointComponent);
+      document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
+
     } catch (error) {
-      throw new Error('Ошибка сохранения точки');
+      this.#creatingPointComponent.updateButtonText('Save');
+      this.#creatingPointComponent.shake();
+      throw new Error('Ошибка сохранения');
     }
-    remove(this.#creatingPointComponent);
-    document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
   };
 
   #escNewPointKeyDownHandler = (evt) => {
@@ -205,6 +219,11 @@ export default class Presenter {
   }
 
   #updatePoints() {
+
+    if (this.#isDataLoadingError) {
+      return;
+    }
+
     const points = this.#getSortedPoints();
     this.#clearPoints();
 

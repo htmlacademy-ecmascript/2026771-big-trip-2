@@ -224,4 +224,18 @@ export default class EditPoint extends AbstractStatefulView {
 
     return point;
   }
+
+  updateButtonText(text) {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    if (saveButton) {
+      saveButton.textContent = text;
+    }
+  }
+
+    deleteButtonText(text) {
+    const deleteButton = this.element.querySelector('.event__reset-btn');
+    if (deleteButton) {
+      deleteButton.textContent = text;
+    }
+  }
 }

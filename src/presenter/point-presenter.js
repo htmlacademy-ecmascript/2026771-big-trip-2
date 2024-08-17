@@ -117,15 +117,22 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = async (updatedPoint) => {
+debugger
 
     try {
       if (updatedPoint === null) {
+        this.#pointEditComponent.deleteButtonText('Deleting...')
         await this.#handleDataChange(this.#point, UserAction.DELETE);
       } else {
+        this.#pointEditComponent.updateButtonText('Saving...');
         await this.#handleDataChange(updatedPoint, UserAction.UPDATE);
       }
+
+      this.#pointEditComponent.updateButtonText('Save');
     } catch (error) {
-      throw new Error('False update point');
+      this.#pointEditComponent.updateButtonText('Save');
+      this.#pointEditComponent.shake();
+      throw new Error('Ошибка обновления');
     }
   };
 
