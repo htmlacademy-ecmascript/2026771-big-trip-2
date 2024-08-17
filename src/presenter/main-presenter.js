@@ -139,7 +139,7 @@ export default class Presenter {
       this.#creatingPointComponent.updateButtonText('Save');
       remove(this.#creatingPointComponent);
       document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
-
+      this.#newEventButton.disabled = false;
     } catch (error) {
       this.#creatingPointComponent.updateButtonText('Save');
       this.#creatingPointComponent.shake();
