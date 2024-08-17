@@ -232,7 +232,7 @@ export default class EditPoint extends AbstractStatefulView {
     }
   }
 
-    deleteButtonText(text) {
+  deleteButtonText(text) {
     const deleteButton = this.element.querySelector('.event__reset-btn');
     if (deleteButton) {
       deleteButton.textContent = text;

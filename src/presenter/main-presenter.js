@@ -314,8 +314,8 @@ export default class Presenter {
 
   #generateTitle(points) {
 
-    const cities = points.map(point => {
-      const destination = this.#destinationsModel.destinations.find(dest => dest.id === point.destination);
+    const cities = points.map((point) => {
+      const destination = this.#destinationsModel.destinations.find((dest) => dest.id === point.destination);
       return destination ? destination.name : '';
     });
     if (cities.length <= 3) {
@@ -325,8 +325,8 @@ export default class Presenter {
   }
 
   #findOfferByTypeAndId(type, id) {
-    const typeOffers = this.#offersModel.offers.find(offerGroup => offerGroup.type === type);
-    return typeOffers.offers.find(offer => offer.id === id);
+    const typeOffers = this.#offersModel.offers.find((offerGroup) => offerGroup.type === type);
+    return typeOffers.offers.find((offer) => offer.id === id);
   }
 
   #calculateTotalCost(points) {
