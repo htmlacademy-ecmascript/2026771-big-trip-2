@@ -6,7 +6,7 @@ import { render, RenderPosition, remove } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { calculateEventDuration, isEscape } from '../utils.js';
 import FilterPresenter from './filters-presenter.js';
-import { MessageWithoutPoint, FiltersScheme, UserAction } from '../constants.js';
+import { MessageWithoutPoint, FiltersScheme, UserAction, COUNT_CITIES, Calendar } from '../constants.js';
 import NewPointView from '/src/view/add-new-point-view.js';
 import Loading from '/src/view/loading-view.js';
 import FailedLoadData from '/src/view/failed-load-data-view.js';
@@ -307,7 +307,7 @@ export default class Presenter {
     const firstPoint = sortedPoints[0];
     const lastPoint = sortedPoints[sortedPoints.length - 1];
     const title = this.#generateTitle(sortedPoints);
-    const dates = `${new Date(firstPoint.dateFrom).toLocaleDateString('en-US', {day: '2-digit',month: 'short'}).toUpperCase()} — ${new Date(lastPoint.dateTo).toLocaleDateString('en-US', {day: '2-digit',month: 'short'}).toUpperCase()}`;
+    const dates = `${new Date(firstPoint.dateFrom).toLocaleDateString(Calendar.LOCALE, {day: Calendar.FORMAT,month: Calendar.MONTH}).toUpperCase()} — ${new Date(lastPoint.dateTo).toLocaleDateString(Calendar.LOCALE, {day: Calendar.FORMAT,month: Calendar.MONTH}).toUpperCase()}`;
     const cost = this.#calculateTotalCost(sortedPoints);
     this.#pageTop.update({ title, dates, cost });
   }
@@ -318,7 +318,7 @@ export default class Presenter {
       const destination = this.#destinationsModel.destinations.find((dest) => dest.id === point.destination);
       return destination ? destination.name : '';
     });
-    if (cities.length <= 3) {
+    if (cities.length <= COUNT_CITIES) {
       return cities.join(' — ');
     }
     return `${cities[0]} —...— ${cities[cities.length - 1]}`;

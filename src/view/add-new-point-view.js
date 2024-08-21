@@ -153,17 +153,10 @@ export default class NewPointView extends AbstractView {
     const destinationName = evt.target.value;
     const destination = this.#destinations.find((dest) => dest.name === destinationName);
 
-    if (!destination) {
-      this.#point = {
-        ...this.#point,
-        destination: null,
-      };
-    } else {
-      this.#point = {
-        ...this.#point,
-        destination: destination.id,
-      };
-    }
+    this.#point = {
+      ...this.#point,
+      destination: (!destination) ? null : destination.id,
+    };
 
     this.element.innerHTML = this.template;
     this._restoreHandlers();
