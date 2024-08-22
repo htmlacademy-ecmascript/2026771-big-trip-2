@@ -41,7 +41,7 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
           <label class="event__label  event__type-output" for="event-destination-${pointId}">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${destinationTemplate ? name : ''}" list="destination-list-${pointId}">
+          <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${name || ''}" list="destination-list-${pointId}">
           <datalist id="destination-list-${pointId}">
           ${destinations.map((destination) => `<option value="${destination.name}"></option>`).join('')}
           </datalist>
