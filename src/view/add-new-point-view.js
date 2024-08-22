@@ -111,14 +111,23 @@ export default class NewPointView extends AbstractView {
     const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked')).map((checkbox) => checkbox.id);
+    const destinationInput = this.element.querySelector('.event__input--destination').value;
+    const destination = this.#destinations.find((dest) => dest.name === destinationInput);
+    const basePrice = parseInt(this.element.querySelector('.event__input--price').value, 10) || 0;
     const timeZone = (new Date().toISOString().slice(-4));
+
+    if (!startDateInput || !endDateInput || !destination || basePrice <= 0) {
+      this.shake();
+      return;
+    }
 
     const updatedPoint = {
       ...this.#point,
       dateFrom: formatDateToISOString(startDateInput, timeZone),
       dateTo: formatDateToISOString(endDateInput, timeZone),
       offers: selectedOffers,
-      basePrice: parseInt(this.element.querySelector('.event__input--price').value, 10) || 0
+      destination: destination.id,
+      basePrice: basePrice
     };
 
     this.#handleFormSubmit(updatedPoint);
@@ -146,8 +155,9 @@ export default class NewPointView extends AbstractView {
 
     this.#point = {
       ...this.#point,
-      destination: destination.id,
+      destination: (!destination) ? null : destination.id,
     };
+
     this.element.innerHTML = this.template;
     this._restoreHandlers();
     this.#initFlatpickr();
@@ -200,6 +210,13 @@ export default class NewPointView extends AbstractView {
     this.#offers = newOffers;
     this.element.innerHTML = this.template;
     this._restoreHandlers();
+  }
+
+  updateButtonText(text) {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    if (saveButton) {
+      saveButton.textContent = text;
+    }
   }
 }
 

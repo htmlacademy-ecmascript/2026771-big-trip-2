@@ -1,9 +1,16 @@
 const MaxPrice = 2000;
 const MinPrice = 15;
+const COUNT_CITIES = 3;
 
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
+};
+
+const Calendar = {
+  LOCALE: 'en-US',
+  FORMAT: '2-digit',
+  MONTH: 'short'
 };
 
 const MessageWithoutPoint = {
@@ -68,4 +75,4 @@ const SERVER_URL = 'https://22.objects.htmlacademy.pro/big-trip';
 
 const AUTORISE = 'Basic 0000';
 
-export { MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES, FiltersScheme, UserAction, Method, SERVER_URL, AUTORISE };
+export { MessageWithoutPoint, FilterTypes, MaxPrice, MinPrice, destinationsID, offersID, types, Mode, SORT_TYPES, FiltersScheme, UserAction, Method, SERVER_URL, AUTORISE, COUNT_CITIES, Calendar };

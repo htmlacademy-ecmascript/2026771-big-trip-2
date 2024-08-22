@@ -13,9 +13,7 @@ export default class TripListModel extends Observable {
     try {
       this.#points = await this.#apiService.points;
     } catch (err) {
-
       this.#points = [];
-      this._notify('update', this.#points);
     }
   }
 
