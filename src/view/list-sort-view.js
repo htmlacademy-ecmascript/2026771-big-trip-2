@@ -32,6 +32,15 @@ export default class Sorting extends AbstractView {
     return createSortTemplate(this.#currentSortType);
   }
 
+  updateSortType(newSortType) {
+    this.#currentSortType = newSortType;
+    this.element.innerHTML = this.template;
+  }
+
+  resetSortType() {
+    this.updateSortType('day');
+  }
+
   #sortTypeChangeHandler = (evt) => {
     evt.preventDefault();
     const inputElement = evt.target.closest('.trip-sort__item');
@@ -42,15 +51,6 @@ export default class Sorting extends AbstractView {
       }
     }
   };
-
-  updateSortType(newSortType) {
-    this.#currentSortType = newSortType;
-    this.element.innerHTML = this.template;
-  }
-
-  resetSortType() {
-    this.updateSortType('day');
-  }
 }
 
 

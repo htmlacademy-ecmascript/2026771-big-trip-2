@@ -9,6 +9,10 @@ export default class OffersModel extends Observable {
     this.#apiService = apiService;
   }
 
+  get offers() {
+    return this.#offers;
+  }
+
   async init() {
     try {
       this.#offers = await this.#apiService.offers;
@@ -16,9 +20,5 @@ export default class OffersModel extends Observable {
     } catch (err) {
       throw new Error('False load offers');
     }
-  }
-
-  get offers() {
-    return this.#offers;
   }
 }

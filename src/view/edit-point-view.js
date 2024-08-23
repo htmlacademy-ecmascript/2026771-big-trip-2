@@ -4,9 +4,9 @@ import 'flatpickr/dist/flatpickr.css';
 import Offer from '/src/view/offer-view.js';
 import Destination from '/src/view/destination-view.js';
 import { formatDateToISOString } from '../utils.js';
+import { POINT_TYPES } from '../constants.js';
 
 function createEditPointTemplate(point, destinations, destinationTemplate, offerTemplate) {
-  const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
   const pointDestination = destinations.find((dest)=>dest.id === point.destination);
   const {basePrice, dateFrom, dateTo, type} = point;
   const {name} = pointDestination || {};
@@ -59,7 +59,7 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-${pointId}" type="number" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -111,6 +111,20 @@ export default class EditPoint extends AbstractStatefulView {
     this.#initFlatpickr();
   }
 
+  updateButtonText(text) {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    if (saveButton) {
+      saveButton.textContent = text;
+    }
+  }
+
+  deleteButtonText(text) {
+    const deleteButton = this.element.querySelector('.event__reset-btn');
+    if (deleteButton) {
+      deleteButton.textContent = text;
+    }
+  }
+
   _restoreHandlers() {
     this.element.querySelector('.event__save-btn').addEventListener('click', this.#formSubmitHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteClickHandler);
@@ -127,12 +141,22 @@ export default class EditPoint extends AbstractStatefulView {
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'))
       .map((checkbox) => checkbox.id);
+    const destinationInput = this.element.querySelector('.event__input--destination').value;
+    const destination = this.#destinations.find((dest) => dest.name === destinationInput);
+    const basePrice = parseInt(this.element.querySelector('.event__input--price').value, 10) || 0;
     const timeZone = (this._state.dateFrom.toString().slice(-4));
+
+    if (!startDateInput || !endDateInput || !destination || basePrice <= 0) {
+      this.shake();
+      return;
+    }
 
     this.updateElement({
       dateFrom: formatDateToISOString(startDateInput, timeZone),
       dateTo: formatDateToISOString(endDateInput, timeZone),
       offers: selectedOffers,
+      destination: destination.id,
+      basePrice: basePrice
     });
     this.#handleFormSubmit(EditPoint.parseStateToPoint(this._state));
   };
@@ -170,6 +194,8 @@ export default class EditPoint extends AbstractStatefulView {
   };
 
   #priceInputHandler = (evt) => {
+    const input = evt.target;
+    input.value = input.value.replace(/[^\d]/g, '');
     evt.preventDefault();
     this._setState({
       basePrice: parseInt(evt.target.value, 10) || 0,
@@ -223,19 +249,5 @@ export default class EditPoint extends AbstractStatefulView {
     }
 
     return point;
-  }
-
-  updateButtonText(text) {
-    const saveButton = this.element.querySelector('.event__save-btn');
-    if (saveButton) {
-      saveButton.textContent = text;
-    }
-  }
-
-  deleteButtonText(text) {
-    const deleteButton = this.element.querySelector('.event__reset-btn');
-    if (deleteButton) {
-      deleteButton.textContent = text;
-    }
   }
 }

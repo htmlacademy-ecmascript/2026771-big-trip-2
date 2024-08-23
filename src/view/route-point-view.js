@@ -1,5 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {calculateEventDuration} from '../utils.js';
+import { Calendar } from '../constants.js';
 
 function createRoutePointTemplate(point, destinations, offers) {
   const {basePrice, dateFrom, dateTo, isFavorite, type} = point;
@@ -21,7 +22,7 @@ function createRoutePointTemplate(point, destinations, offers) {
   return (
     `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${dateFrom}">${new Date(dateFrom).toLocaleDateString('en-US', {day: '2-digit',month: 'short'}).toUpperCase()}
+      <time class="event__date" datetime="${dateFrom}">${new Date(dateFrom).toLocaleDateString(Calendar.LOCALE, {day: Calendar.FORMAT, month: Calendar.MONTH}).toUpperCase()}
       </time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${iconSrc}.png" alt="Event type icon">

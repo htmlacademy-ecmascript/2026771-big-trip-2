@@ -14,10 +14,10 @@ const offersModel = new OffersModel({apiService: pointApiservice});
 
 const sectionContentElement = document.querySelector('.trip-events');
 const newPageTopElement = document.querySelector('.trip-main');
-const filtersContainer = newPageTopElement.querySelector('.trip-controls__filters');
+const filtersElement = newPageTopElement.querySelector('.trip-controls__filters');
 
 const newPresenter = new Presenter({
-  FilterContentBlock: filtersContainer,
+  FilterContentBlock: filtersElement,
   ContentBlock: sectionContentElement,
   PageTopBlock: newPageTopElement,
   tripListModel: tripListModel,
