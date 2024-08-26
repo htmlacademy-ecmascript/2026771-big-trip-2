@@ -1,11 +1,4 @@
-function getRandomArrayElement(items, count = 1) {
-  const shuffled = items.sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-}
-
-function getRandomNumber(MinPrice, MaxPrice) {
-  return Math.floor(Math.random() * (MaxPrice - MinPrice + 1)) + MinPrice;
-}
+const isEscape = (evt) => evt.key === 'Escape';
 
 function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
 
@@ -48,8 +41,6 @@ function formatDateToISOString(dateStr, timeZone) {
   return formattedDateStr;
 }
 
-const isEscape = (evt) => evt.key === 'Escape';
-
 function countPointsByFilter(points) {
   const currentDate = new Date();
   return {
@@ -61,4 +52,4 @@ function countPointsByFilter(points) {
 }
 
 
-export {getRandomArrayElement, getRandomNumber, calculateEventDuration, isEscape, countPointsByFilter, formatDateToISOString};
+export { calculateEventDuration, isEscape, countPointsByFilter, formatDateToISOString };

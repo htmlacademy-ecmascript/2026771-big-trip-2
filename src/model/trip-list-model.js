@@ -9,21 +9,16 @@ export default class TripListModel extends Observable {
     this.#apiService = apiService;
   }
 
+  get points() {
+    return this.#points;
+  }
+
   async init() {
     try {
       this.#points = await this.#apiService.points;
     } catch (err) {
       this.#points = [];
     }
-  }
-
-  get points() {
-    return this.#points;
-  }
-
-  setPoints(points) {
-    this.#points = points;
-    this._notify('update', this.#points);
   }
 
   async addPoint(point) {

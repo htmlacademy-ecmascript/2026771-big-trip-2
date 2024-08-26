@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import RoutePoint from '/src/view/route-point-view.js';
 import EditPoint from '/src/view/edit-point-view.js';
 import { isEscape } from '../utils.js';
-import { Mode, UserAction } from '../constants.js';
+import { Mode, UserAction, ButtonText } from '../constants.js';
 
 export default class PointPresenter {
   #routePointListElement;
@@ -50,7 +50,8 @@ export default class PointPresenter {
       onRollupClick: this.#handleRollupClick
     });
 
-    if (prevPointComponent === undefined || prevPointEditComponent === undefined) {
+    if (!prevPointComponent || !prevPointEditComponent) {
+
       render(this.#pointComponent, this.#routePointListElement);
       return;
     }
@@ -119,20 +120,18 @@ export default class PointPresenter {
   #handleFormSubmit = async (updatedPoint) => {
 
     try {
-      if (updatedPoint === null) {
-        this.#pointEditComponent.deleteButtonText('Deleting...');
+      if (!updatedPoint) {
+        this.#pointEditComponent.deleteButtonText(ButtonText.DELETING);
         await this.#handleDataChange(this.#point, UserAction.DELETE);
       } else {
-        this.#pointEditComponent.updateButtonText('Saving...');
+        this.#pointEditComponent.updateButtonText(ButtonText.SAVING);
         await this.#handleDataChange(updatedPoint, UserAction.UPDATE);
       }
-
-      this.#pointEditComponent.updateButtonText('Save');
     } catch (error) {
-      this.#pointEditComponent.updateButtonText('Save');
       this.#pointEditComponent.shake();
       throw new Error('Ошибка обновления');
     }
+    this.#pointEditComponent.updateButtonText(ButtonText.SAVE);
   };
 
   #handleDeleteClick = () => {

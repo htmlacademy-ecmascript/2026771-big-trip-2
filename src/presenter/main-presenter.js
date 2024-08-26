@@ -6,7 +6,7 @@ import { render, RenderPosition, remove } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { calculateEventDuration, isEscape } from '../utils.js';
 import FilterPresenter from './filters-presenter.js';
-import { MessageWithoutPoint, FiltersScheme, UserAction, COUNT_CITIES, Calendar } from '../constants.js';
+import { MessageWithoutPoint, FiltersScheme, UserAction, COUNT_CITIES, Calendar, ButtonText } from '../constants.js';
 import NewPointView from '/src/view/add-new-point-view.js';
 import Loading from '/src/view/loading-view.js';
 import FailedLoadData from '/src/view/failed-load-data-view.js';
@@ -106,7 +106,7 @@ export default class Presenter {
     const newPointBlock = document.querySelector('.trip-events__trip-sort');
 
     const defaultType = 'flight';
-    const defaultOffers = this.#offersModel.offers.find((offer) => offer.type === 'flight').offers;
+    const defaultOffers = this.#offersModel.offers.find((offer) => offer.type === defaultType).offers;
     this.#creatingPointComponent = new NewPointView({
       point: {
         isFavorite: false,
@@ -131,17 +131,17 @@ export default class Presenter {
   };
 
   #handleNewPointSave = async (point) => {
-    this.#creatingPointComponent.updateButtonText('Saving...');
+    this.#creatingPointComponent.updateButtonText(ButtonText.SAVING);
 
     try {
       await this.#tripListModel.addPoint(point);
       this.#updatePoints();
-      this.#creatingPointComponent.updateButtonText('Save');
+      this.#creatingPointComponent.updateButtonText(ButtonText.SAVE);
       remove(this.#creatingPointComponent);
       document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
       this.#newEventButton.disabled = false;
     } catch (error) {
-      this.#creatingPointComponent.updateButtonText('Save');
+      this.#creatingPointComponent.updateButtonText(ButtonText.SAVE);
       this.#creatingPointComponent.shake();
       throw new Error('Ошибка сохранения');
     }
@@ -350,8 +350,6 @@ export default class Presenter {
       case UserAction.ADD:
         this.#tripListModel.addPoint(updatedPoint);
         break;
-      default:
-        throw new Error(`Unknown action type: ${actionType}`);
     }
     this.#updatePoints();
   };

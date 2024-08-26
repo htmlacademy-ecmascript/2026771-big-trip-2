@@ -3,11 +3,7 @@ import AbstractView from '../framework/view/abstract-view.js';
 function createDestinationTemplate(point, destinations) {
   const pointDestination = destinations.find((dest) => dest.id === point.destination);
 
-  if (!pointDestination) {
-    return '';
-  }
-
-  if (!pointDestination.pictures[0]) {
+  if (!pointDestination || !pointDestination.pictures[0]) {
     return '';
   }
 

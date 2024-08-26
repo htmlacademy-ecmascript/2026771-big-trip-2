@@ -4,9 +4,9 @@ import 'flatpickr/dist/flatpickr.css';
 import Offer from '/src/view/offer-view.js';
 import Destination from '/src/view/destination-view.js';
 import { formatDateToISOString } from '../utils.js';
+import { POINT_TYPES } from '../constants.js';
 
 function createNewPointTemplate(point, destinations, destinationTemplate, offerTemplate) {
-  const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
   const pointDestination = destinations.find((dest) => dest.id === point.destination);
   const { basePrice, dateFrom, dateTo, type } = point;
   const { name } = pointDestination || {};
@@ -57,7 +57,7 @@ function createNewPointTemplate(point, destinations, destinationTemplate, offerT
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-${pointId}" type="number" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}">
         </div>
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
@@ -95,6 +95,19 @@ export default class NewPointView extends AbstractView {
     const offerView = new Offer(this.#point, this.#offers);
     const offerTemplate = offerView.template;
     return createNewPointTemplate(this.#point, this.#destinations, destinationTemplate, offerTemplate);
+  }
+
+  updateOffers(newOffers) {
+    this.#offers = newOffers;
+    this.element.innerHTML = this.template;
+    this._restoreHandlers();
+  }
+
+  updateButtonText(text) {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    if (saveButton) {
+      saveButton.textContent = text;
+    }
   }
 
   _restoreHandlers() {
@@ -164,6 +177,8 @@ export default class NewPointView extends AbstractView {
   };
 
   #priceInputHandler = (evt) => {
+    const input = evt.target;
+    input.value = input.value.replace(/[^\d]/g, '');
     this.#point = {
       ...this.#point,
       basePrice: parseInt(evt.target.value, 10) || 0,
@@ -204,19 +219,6 @@ export default class NewPointView extends AbstractView {
         endTimePicker.set('minDate', selectedDates[0] || null);
       }
     });
-  }
-
-  updateOffers(newOffers) {
-    this.#offers = newOffers;
-    this.element.innerHTML = this.template;
-    this._restoreHandlers();
-  }
-
-  updateButtonText(text) {
-    const saveButton = this.element.querySelector('.event__save-btn');
-    if (saveButton) {
-      saveButton.textContent = text;
-    }
   }
 }
 
