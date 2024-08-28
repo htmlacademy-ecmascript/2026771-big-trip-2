@@ -41,9 +41,9 @@ const MessageWithoutPoint = {
 
 const FiltersScheme = {
   EVERYTHING: 'everything',
-  PAST: 'past',
+  FUTURE: 'future',
   PRESENT: 'present',
-  FUTURE: 'future'
+  PAST: 'past',
 };
 
 const FilterTypes = Object.values(FiltersScheme);

@@ -27,6 +27,7 @@ export default class Presenter {
   #filterPresenter = null;
   #creatingPointComponent = null;
   #newEventButton = null;
+  #newPointElement = null;
   #isCreatingNewPoint = false;
   #isDataLoadingError = false;
 
@@ -93,17 +94,18 @@ export default class Presenter {
   }
 
   #handleNewPointButtonClick = () => {
+
+    this.#clearEmptyMessage();
     this.#handleModeChange();
     this.#filterModel.setFilter(FiltersScheme.EVERYTHING);
     this.#currentSortType = 'day';
     this.#sorting.resetSortType();
+    this.#newPointElement = document.querySelector('.trip-events__list');
 
     if (this.#creatingPointComponent) {
       this.#creatingPointComponent.element.remove();
       this.#creatingPointComponent = null;
     }
-
-    const newPointBlock = document.querySelector('.trip-events__trip-sort');
 
     const defaultType = 'flight';
     const defaultOffers = this.#offersModel.offers.find((offer) => offer.type === defaultType).offers;
@@ -124,7 +126,7 @@ export default class Presenter {
       onTypeChange: this.#handleTypeChange,
     });
 
-    render(this.#creatingPointComponent, newPointBlock);
+    render(this.#creatingPointComponent, this.#newPointElement, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escNewPointKeyDownHandler);
     this.#newEventButton.disabled = true;
     this.#isCreatingNewPoint = true;
@@ -154,10 +156,12 @@ export default class Presenter {
   };
 
   #handleNewPointCancel = () => {
-    this.#newEventButton.disabled = false;
-    this.#isCreatingNewPoint = false;
-    remove(this.#creatingPointComponent);
-    document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
+    if(this.#isCreatingNewPoint){
+      this.#newEventButton.disabled = false;
+      this.#isCreatingNewPoint = false;
+      remove(this.#creatingPointComponent);
+      document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
+    }
   };
 
   #handleSortTypeChange = (sortType) => {

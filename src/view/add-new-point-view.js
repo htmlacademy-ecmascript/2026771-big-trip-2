@@ -14,7 +14,8 @@ function createNewPointTemplate(point, destinations, destinationTemplate, offerT
   const iconSrc = type.toLowerCase();
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+    <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-${pointId}">
@@ -67,7 +68,8 @@ function createNewPointTemplate(point, destinations, destinationTemplate, offerT
         ${offerTemplate || '<p>No offers available</p>'}
         ${destinationTemplate || ''}
       </section>
-    </form>`
+    </form>
+    </li>`
   );
 }
 
@@ -85,7 +87,7 @@ export default class NewPointView extends AbstractView {
     this.#handleFormSubmit = onSave;
     this.#handleFormCancel = onCancel;
     this.#point = point;
-    this._restoreHandlers();
+    this.restoreHandlers();
     this.#initFlatpickr();
   }
 
@@ -100,7 +102,7 @@ export default class NewPointView extends AbstractView {
   updateOffers(newOffers) {
     this.#offers = newOffers;
     this.element.innerHTML = this.template;
-    this._restoreHandlers();
+    this.restoreHandlers();
   }
 
   updateButtonText(text) {
@@ -110,17 +112,27 @@ export default class NewPointView extends AbstractView {
     }
   }
 
-  _restoreHandlers() {
+  restoreHandlers() {
     this.element.querySelector('.event__save-btn').addEventListener('click', this.#formSubmitHandler);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteClickHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#cancelClickHandler);
     this.element.querySelectorAll('.event__type-input').forEach((input) => input.addEventListener('change', this.#typeChangeHandler));
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceInputHandler);
   }
 
+  removeHandlers() {
+
+    this.element.querySelector('.event__save-btn').removeEventListener('click', this.#formSubmitHandler);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#cancelClickHandler);
+    this.element.querySelectorAll('.event__type-input').forEach((input) => input.removeEventListener('change', this.#typeChangeHandler));
+    this.element.querySelector('.event__input--destination').removeEventListener('input', this.#destinationChangeHandler);
+    this.element.querySelector('.event__input--price').removeEventListener('input', this.#priceInputHandler);
+  }
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
 
+    this.removeHandlers();
     const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked')).map((checkbox) => checkbox.id);
@@ -158,7 +170,7 @@ export default class NewPointView extends AbstractView {
     };
 
     this.element.innerHTML = this.template;
-    this._restoreHandlers();
+    this.restoreHandlers();
     this.#initFlatpickr();
   };
 
@@ -172,7 +184,7 @@ export default class NewPointView extends AbstractView {
     };
 
     this.element.innerHTML = this.template;
-    this._restoreHandlers();
+    this.restoreHandlers();
     this.#initFlatpickr();
   };
 
@@ -185,7 +197,7 @@ export default class NewPointView extends AbstractView {
     };
   };
 
-  #deleteClickHandler = (evt) => {
+  #cancelClickHandler = (evt) => {
     evt.preventDefault();
     if (this.#handleFormCancel) {
       this.#handleFormCancel();
@@ -202,7 +214,6 @@ export default class NewPointView extends AbstractView {
 
     const endTimePicker = flatpickr(endTimeInput, {
       enableTime: true,
-      static: true,
       dateFormat: 'd/m/y H:i',
       minDate: startTimeInput.value,
       // eslint-disable-next-line camelcase
@@ -211,7 +222,6 @@ export default class NewPointView extends AbstractView {
 
     flatpickr(startTimeInput, {
       enableTime: true,
-      static: true,
       dateFormat: 'd/m/y H:i',
       // eslint-disable-next-line camelcase
       time_24hr: true,

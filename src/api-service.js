@@ -19,36 +19,46 @@ export default class PointsApiService extends ApiService {
   }
 
   async updatePoint(point) {
-    const response = await this._load({
-      url: `points/${point.id}`,
-      method: Method.PUT,
-      body: JSON.stringify(this.#adaptPointToServer(point)),
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-    });
+    try {
+      const response = await this._load({
+        url: `points/${point.id}`,
+        method: Method.PUT,
+        body: JSON.stringify(this.#adaptPointToServer(point)),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+      });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return this.#adaptPointToClient(parsedResponse);
+      const parsedResponse = await ApiService.parseResponse(response);
+      return this.#adaptPointToClient(parsedResponse);
+    } catch (error) {
+      throw new error('Ошибка при обновлении точки:', error);
+    }
   }
 
   async addPoint(point) {
-    const response = await this._load({
-      url: 'points',
-      method: Method.POST,
-      body: JSON.stringify(this.#adaptPointToServer(point)),
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-    });
+    try {
+      const response = await this._load({
+        url: 'points',
+        method: Method.POST,
+        body: JSON.stringify(this.#adaptPointToServer(point)),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+      });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return this.#adaptPointToClient(parsedResponse);
+      const parsedResponse = await ApiService.parseResponse(response);
+      return this.#adaptPointToClient(parsedResponse);
+    } catch (error) {
+      throw new error('Ошибка при добавлении точки:', error);
+    }
   }
 
   async deletePoint(point) {
-    await this._load({
-      url: `points/${point}`,
-      method: Method.DELETE,
-    });
+    try {
+      await this._load({
+        url: `points/${point}`,
+        method: Method.DELETE,
+      });
+    } catch (error) {
+      throw new error('Ошибка при удалении точки:', error);
+    }
   }
 
   #adaptPointToClient(point) {

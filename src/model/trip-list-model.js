@@ -18,6 +18,7 @@ export default class TripListModel extends Observable {
       this.#points = await this.#apiService.points;
     } catch (err) {
       this.#points = [];
+      throw new Error('Ошибка загрузки точек');
     }
   }
 

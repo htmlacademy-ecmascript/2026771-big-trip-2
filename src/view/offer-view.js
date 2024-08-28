@@ -6,8 +6,7 @@ function createOfferTemplate(point, offers) {
   const typeOffers = typeOffersObj ? typeOffersObj.offers : [];
 
   if (typeOffers.length === 0) {
-    return `<section class="event__section event__section--offers">
-    </section>`;
+    return '';
   }
 
   return (
