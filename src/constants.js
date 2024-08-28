@@ -15,8 +15,8 @@ const SORT_TYPES = [
 ];
 
 const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
+  LOWER_LIMIT: 0,
+  UPPER_LIMIT: 300,
 };
 
 const ButtonText = {

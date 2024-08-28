@@ -132,18 +132,17 @@ export default class PointPresenter {
         this.#pointEditComponent.updateButtonText(ButtonText.SAVING);
         await this.#handleDataChange(updatedPoint, UserAction.UPDATE);
       }
+      this.#uiBlocker.unblock();
     } catch (error) {
       this.#pointEditComponent.shake();
       throw new Error('Ошибка обновления');
     }
     this.#pointEditComponent.updateButtonText(ButtonText.SAVE);
-    this.#uiBlocker.block();
   };
 
   #handleDeleteClick = () => {
-    this.#uiBlocker.block();
     this.#handleFormSubmit(null);
-    this.#uiBlocker.block();
+
   };
 }
 
