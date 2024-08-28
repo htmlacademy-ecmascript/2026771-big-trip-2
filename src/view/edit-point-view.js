@@ -5,6 +5,7 @@ import Offer from '/src/view/offer-view.js';
 import Destination from '/src/view/destination-view.js';
 import { formatDateToISOString } from '../utils.js';
 import { POINT_TYPES } from '../constants.js';
+
 const offsetTime = new Date().getTimezoneOffset() / 60;
 
 function createEditPointTemplate(point, destinations, destinationTemplate, offerTemplate) {

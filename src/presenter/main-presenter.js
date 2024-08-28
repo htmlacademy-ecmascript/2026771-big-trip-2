@@ -6,10 +6,11 @@ import { render, RenderPosition, remove } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { calculateEventDuration, isEscape } from '../utils.js';
 import FilterPresenter from './filters-presenter.js';
-import { MessageWithoutPoint, FiltersScheme, UserAction, COUNT_CITIES, Calendar, ButtonText } from '../constants.js';
+import { MessageWithoutPoint, FiltersScheme, UserAction, COUNT_CITIES, Calendar, ButtonText, TimeLimit } from '../constants.js';
 import NewPointView from '/src/view/add-new-point-view.js';
 import Loading from '/src/view/loading-view.js';
 import FailedLoadData from '/src/view/failed-load-data-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class Presenter {
   #filterContentBlock;
@@ -30,6 +31,10 @@ export default class Presenter {
   #newPointElement = null;
   #isCreatingNewPoint = false;
   #isDataLoadingError = false;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({ FilterContentBlock, ContentBlock, PageTopBlock, tripListModel, destinationsModel, offersModel, filterModel }) {
     this.#filterContentBlock = FilterContentBlock;
@@ -133,6 +138,7 @@ export default class Presenter {
   };
 
   #handleNewPointSave = async (point) => {
+    this.#uiBlocker.block();
     this.#creatingPointComponent.updateButtonText(ButtonText.SAVING);
 
     try {
@@ -147,6 +153,7 @@ export default class Presenter {
       this.#creatingPointComponent.shake();
       throw new Error('Ошибка сохранения');
     }
+    this.#uiBlocker.unblock();
   };
 
   #escNewPointKeyDownHandler = (evt) => {
