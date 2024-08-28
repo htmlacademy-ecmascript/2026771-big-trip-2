@@ -148,12 +148,12 @@ export default class Presenter {
       remove(this.#creatingPointComponent);
       document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
       this.#newEventButton.disabled = false;
+      this.#uiBlocker.unblock();
     } catch (error) {
       this.#creatingPointComponent.updateButtonText(ButtonText.SAVE);
       this.#creatingPointComponent.shake();
       throw new Error('Ошибка сохранения');
     }
-    this.#uiBlocker.unblock();
   };
 
   #escNewPointKeyDownHandler = (evt) => {
