@@ -6,15 +6,20 @@ import Destination from '/src/view/destination-view.js';
 import { formatDateToISOString } from '../utils.js';
 import { POINT_TYPES } from '../constants.js';
 
+const offsetTime = new Date().getTimezoneOffset() / 60;
+
 function createEditPointTemplate(point, destinations, destinationTemplate, offerTemplate) {
   const pointDestination = destinations.find((dest)=>dest.id === point.destination);
   const {basePrice, dateFrom, dateTo, type} = point;
   const {name} = pointDestination || {};
   const pointId = point.id || 0;
   const iconSrc = type.toLowerCase();
+  const localFromDate = new Date(new Date(dateFrom).getTime() + offsetTime * 3600000).toUTCString();
+  const localToDate = new Date(new Date(dateTo).getTime() + offsetTime * 3600000).toUTCString();
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-${pointId}">
@@ -48,10 +53,10 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
         </div>
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${dateFrom}">
+          <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${localFromDate}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${dateTo}">
+          <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${localToDate}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -73,7 +78,8 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
         ${offerTemplate || ''}
         ${destinationTemplate || ''}
       </section>
-    </form>`
+    </form>
+  </li>`
   );
 }
 
@@ -134,9 +140,19 @@ export default class EditPoint extends AbstractStatefulView {
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceInputHandler);
   }
 
+  _removeEventListeners() {
+    this.element.querySelector('.event__save-btn').removeEventListener('click', this.#formSubmitHandler);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#deleteClickHandler);
+    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#rollupClickHandler);
+    this.element.querySelectorAll('.event__type-input').forEach((input) => input.removeEventListener('change', this.#typeChangeHandler));
+    this.element.querySelector('.event__input--destination').removeEventListener('input', this.#destinationChangeHandler);
+    this.element.querySelector('.event__input--price').removeEventListener('input', this.#priceInputHandler);
+  }
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
 
+    this._removeEventListeners();
     const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'))
@@ -144,7 +160,6 @@ export default class EditPoint extends AbstractStatefulView {
     const destinationInput = this.element.querySelector('.event__input--destination').value;
     const destination = this.#destinations.find((dest) => dest.name === destinationInput);
     const basePrice = parseInt(this.element.querySelector('.event__input--price').value, 10) || 0;
-    const timeZone = (this._state.dateFrom.toString().slice(-4));
 
     if (!startDateInput || !endDateInput || !destination || basePrice <= 0) {
       this.shake();
@@ -152,8 +167,8 @@ export default class EditPoint extends AbstractStatefulView {
     }
 
     this.updateElement({
-      dateFrom: formatDateToISOString(startDateInput, timeZone),
-      dateTo: formatDateToISOString(endDateInput, timeZone),
+      dateFrom: formatDateToISOString(startDateInput),
+      dateTo: formatDateToISOString(endDateInput),
       offers: selectedOffers,
       destination: destination.id,
       basePrice: basePrice
@@ -214,7 +229,6 @@ export default class EditPoint extends AbstractStatefulView {
 
     const endTimePicker = flatpickr(endTimeInput, {
       enableTime: true,
-      static: true,
       dateFormat: 'd/m/y H:i',
       minDate: startTimeInput.value,
       // eslint-disable-next-line camelcase
@@ -223,7 +237,6 @@ export default class EditPoint extends AbstractStatefulView {
 
     flatpickr(startTimeInput, {
       enableTime: true,
-      static: true,
       dateFormat: 'd/m/y H:i',
       // eslint-disable-next-line camelcase
       time_24hr: true,

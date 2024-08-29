@@ -2,7 +2,8 @@ import { render, replace, remove } from '../framework/render.js';
 import RoutePoint from '/src/view/route-point-view.js';
 import EditPoint from '/src/view/edit-point-view.js';
 import { isEscape } from '../utils.js';
-import { Mode, UserAction, ButtonText } from '../constants.js';
+import { Mode, UserAction, ButtonText, TimeLimit } from '../constants.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class PointPresenter {
   #routePointListElement;
@@ -15,6 +16,10 @@ export default class PointPresenter {
   #offersModel;
   #mode = Mode.DEFAULT;
   #onNewPointCancel;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({ routePointListElement, destinationsModel, offersModel, onDataChange, onModeChange, onNewPointCancel }) {
     this.#routePointListElement = routePointListElement;
@@ -118,7 +123,7 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = async (updatedPoint) => {
-
+    this.#uiBlocker.block();
     try {
       if (!updatedPoint) {
         this.#pointEditComponent.deleteButtonText(ButtonText.DELETING);
@@ -127,6 +132,7 @@ export default class PointPresenter {
         this.#pointEditComponent.updateButtonText(ButtonText.SAVING);
         await this.#handleDataChange(updatedPoint, UserAction.UPDATE);
       }
+      this.#uiBlocker.unblock();
     } catch (error) {
       this.#pointEditComponent.shake();
       throw new Error('Ошибка обновления');
@@ -136,6 +142,7 @@ export default class PointPresenter {
 
   #handleDeleteClick = () => {
     this.#handleFormSubmit(null);
+
   };
 }
 

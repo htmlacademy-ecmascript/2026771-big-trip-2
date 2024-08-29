@@ -18,7 +18,7 @@ export default class OffersModel extends Observable {
       this.#offers = await this.#apiService.offers;
       this._notify('update', this.#offers);
     } catch (err) {
-      throw new Error('False load offers');
+      throw new Error('Ошибка загрузки предложения');
     }
   }
 }

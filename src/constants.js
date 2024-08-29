@@ -14,6 +14,11 @@ const SORT_TYPES = [
   { type: 'offer', active: 'disabled' }
 ];
 
+const TimeLimit = {
+  LOWER_LIMIT: 0,
+  UPPER_LIMIT: 300,
+};
+
 const ButtonText = {
   SAVE: 'Save',
   DELETE: 'Delete',
@@ -41,9 +46,9 @@ const MessageWithoutPoint = {
 
 const FiltersScheme = {
   EVERYTHING: 'everything',
-  PAST: 'past',
+  FUTURE: 'future',
   PRESENT: 'present',
-  FUTURE: 'future'
+  PAST: 'past',
 };
 
 const FilterTypes = Object.values(FiltersScheme);
@@ -61,4 +66,4 @@ const Method = {
   DELETE: 'DELETE'
 };
 
-export { MessageWithoutPoint, FilterTypes, POINT_TYPES, Mode, SORT_TYPES, FiltersScheme, UserAction, Method, SERVER_URL, AUTORISE, COUNT_CITIES, Calendar, ButtonText };
+export { MessageWithoutPoint, FilterTypes, POINT_TYPES, Mode, SORT_TYPES, FiltersScheme, UserAction, Method, SERVER_URL, AUTORISE, COUNT_CITIES, Calendar, ButtonText, TimeLimit };

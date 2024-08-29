@@ -6,10 +6,11 @@ import { render, RenderPosition, remove } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { calculateEventDuration, isEscape } from '../utils.js';
 import FilterPresenter from './filters-presenter.js';
-import { MessageWithoutPoint, FiltersScheme, UserAction, COUNT_CITIES, Calendar, ButtonText } from '../constants.js';
+import { MessageWithoutPoint, FiltersScheme, UserAction, COUNT_CITIES, Calendar, ButtonText, TimeLimit } from '../constants.js';
 import NewPointView from '/src/view/add-new-point-view.js';
 import Loading from '/src/view/loading-view.js';
 import FailedLoadData from '/src/view/failed-load-data-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class Presenter {
   #filterContentBlock;
@@ -27,8 +28,13 @@ export default class Presenter {
   #filterPresenter = null;
   #creatingPointComponent = null;
   #newEventButton = null;
+  #newPointElement = null;
   #isCreatingNewPoint = false;
   #isDataLoadingError = false;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({ FilterContentBlock, ContentBlock, PageTopBlock, tripListModel, destinationsModel, offersModel, filterModel }) {
     this.#filterContentBlock = FilterContentBlock;
@@ -93,17 +99,18 @@ export default class Presenter {
   }
 
   #handleNewPointButtonClick = () => {
+
+    this.#clearEmptyMessage();
     this.#handleModeChange();
     this.#filterModel.setFilter(FiltersScheme.EVERYTHING);
     this.#currentSortType = 'day';
     this.#sorting.resetSortType();
+    this.#newPointElement = document.querySelector('.trip-events__list');
 
     if (this.#creatingPointComponent) {
       this.#creatingPointComponent.element.remove();
       this.#creatingPointComponent = null;
     }
-
-    const newPointBlock = document.querySelector('.trip-events__trip-sort');
 
     const defaultType = 'flight';
     const defaultOffers = this.#offersModel.offers.find((offer) => offer.type === defaultType).offers;
@@ -124,13 +131,14 @@ export default class Presenter {
       onTypeChange: this.#handleTypeChange,
     });
 
-    render(this.#creatingPointComponent, newPointBlock);
+    render(this.#creatingPointComponent, this.#newPointElement, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escNewPointKeyDownHandler);
     this.#newEventButton.disabled = true;
     this.#isCreatingNewPoint = true;
   };
 
   #handleNewPointSave = async (point) => {
+    this.#uiBlocker.block();
     this.#creatingPointComponent.updateButtonText(ButtonText.SAVING);
 
     try {
@@ -140,6 +148,7 @@ export default class Presenter {
       remove(this.#creatingPointComponent);
       document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
       this.#newEventButton.disabled = false;
+      this.#uiBlocker.unblock();
     } catch (error) {
       this.#creatingPointComponent.updateButtonText(ButtonText.SAVE);
       this.#creatingPointComponent.shake();
@@ -154,10 +163,12 @@ export default class Presenter {
   };
 
   #handleNewPointCancel = () => {
-    this.#newEventButton.disabled = false;
-    this.#isCreatingNewPoint = false;
-    remove(this.#creatingPointComponent);
-    document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
+    if(this.#isCreatingNewPoint){
+      this.#newEventButton.disabled = false;
+      this.#isCreatingNewPoint = false;
+      remove(this.#creatingPointComponent);
+      document.removeEventListener('keydown', this.#escNewPointKeyDownHandler);
+    }
   };
 
   #handleSortTypeChange = (sortType) => {
