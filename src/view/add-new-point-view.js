@@ -139,7 +139,6 @@ export default class NewPointView extends AbstractView {
     const destinationInput = this.element.querySelector('.event__input--destination').value;
     const destination = this.#destinations.find((dest) => dest.name === destinationInput);
     const basePrice = parseInt(this.element.querySelector('.event__input--price').value, 10) || 0;
-    const timeZone = (new Date().toISOString().slice(-4));
 
     if (!startDateInput || !endDateInput || !destination || basePrice <= 0) {
       this.shake();
@@ -148,8 +147,8 @@ export default class NewPointView extends AbstractView {
 
     const updatedPoint = {
       ...this.#point,
-      dateFrom: formatDateToISOString(startDateInput, timeZone),
-      dateTo: formatDateToISOString(endDateInput, timeZone),
+      dateFrom: formatDateToISOString(startDateInput),
+      dateTo: formatDateToISOString(endDateInput),
       offers: selectedOffers,
       destination: destination.id,
       basePrice: basePrice
