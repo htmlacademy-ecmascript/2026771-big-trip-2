@@ -136,7 +136,6 @@ export default class PointPresenter {
 
       this.#uiBlocker.unblock();
     } catch (error) {
-      this.#pointEditComponent.shake();
       throw new Error('Ошибка обновления');
     }
     this.#pointEditComponent.updateButtonText(ButtonText.SAVE);

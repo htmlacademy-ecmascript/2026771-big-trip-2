@@ -132,7 +132,6 @@ export default class NewPointView extends AbstractView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
 
-    this.removeHandlers();
     const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked')).map((checkbox) => checkbox.id);
@@ -155,6 +154,7 @@ export default class NewPointView extends AbstractView {
     };
 
     this.#handleFormSubmit(updatedPoint);
+    this.removeHandlers();
   };
 
   #typeChangeHandler = (evt) => {
