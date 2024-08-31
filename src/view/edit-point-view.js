@@ -152,7 +152,6 @@ export default class EditPoint extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
 
-    this._removeEventListeners();
     const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
     const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'))
@@ -174,6 +173,7 @@ export default class EditPoint extends AbstractStatefulView {
       basePrice: basePrice
     });
     this.#handleFormSubmit(EditPoint.parseStateToPoint(this._state));
+    this._removeEventListeners();
   };
 
 

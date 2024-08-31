@@ -124,6 +124,7 @@ export default class PointPresenter {
 
   #handleFormSubmit = async (updatedPoint) => {
     this.#uiBlocker.block();
+
     try {
       if (!updatedPoint) {
         this.#pointEditComponent.deleteButtonText(ButtonText.DELETING);
@@ -132,9 +133,9 @@ export default class PointPresenter {
         this.#pointEditComponent.updateButtonText(ButtonText.SAVING);
         await this.#handleDataChange(updatedPoint, UserAction.UPDATE);
       }
+
       this.#uiBlocker.unblock();
     } catch (error) {
-      this.#pointEditComponent.shake();
       throw new Error('Ошибка обновления');
     }
     this.#pointEditComponent.updateButtonText(ButtonText.SAVE);
@@ -145,4 +146,3 @@ export default class PointPresenter {
 
   };
 }
-
