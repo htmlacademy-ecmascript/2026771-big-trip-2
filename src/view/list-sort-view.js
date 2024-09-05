@@ -18,12 +18,12 @@ function createSortTemplate(activeSortType) {
 }
 
 export default class Sorting extends AbstractView {
-  #handleSortTypeChange = null;
+  #onSortTypeChange = null;
   #currentSortType = 'day';
 
   constructor({ onSortTypeChange, initialSortType }) {
     super();
-    this.#handleSortTypeChange = onSortTypeChange;
+    this.#onSortTypeChange = onSortTypeChange;
     this.#currentSortType = initialSortType || 'day';
     this.element.addEventListener('change', this.#sortTypeChangeHandler);
   }
@@ -46,8 +46,8 @@ export default class Sorting extends AbstractView {
     const inputElement = evt.target.closest('.trip-sort__item');
     if (inputElement) {
       const sortType = inputElement.querySelector('label').dataset.sortType;
-      if (this.#handleSortTypeChange) {
-        this.#handleSortTypeChange(sortType);
+      if (this.#onSortTypeChange) {
+        this.#onSortTypeChange(sortType);
       }
     }
   };

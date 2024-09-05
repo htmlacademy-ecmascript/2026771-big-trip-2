@@ -1,10 +1,16 @@
 const COUNT_CITIES = 3;
 
+const MILLISECONDS_PER_MINUTE = 60000;
+
+const MINUTES_PER_HOUR = 60;
+
+const HOURS_PER_DAY = 24;
+
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 const SERVER_URL = 'https://22.objects.htmlacademy.pro/big-trip';
 
-const AUTORISE = 'Basic 0000';
+const AUTHORIZATION = 'Basic 0000';
 
 const SORT_TYPES = [
   { type: 'day', active: 'checked' },
@@ -66,4 +72,4 @@ const Method = {
   DELETE: 'DELETE'
 };
 
-export { MessageWithoutPoint, FilterTypes, POINT_TYPES, Mode, SORT_TYPES, FiltersScheme, UserAction, Method, SERVER_URL, AUTORISE, COUNT_CITIES, Calendar, ButtonText, TimeLimit };
+export { MessageWithoutPoint, FilterTypes, POINT_TYPES, Mode, SORT_TYPES, FiltersScheme, UserAction, Method, SERVER_URL, AUTHORIZATION, COUNT_CITIES, Calendar, ButtonText, TimeLimit, MILLISECONDS_PER_MINUTE, MINUTES_PER_HOUR, HOURS_PER_DAY };

@@ -7,7 +7,7 @@ import PointPresenter from './point-presenter.js';
 import { calculateEventDuration, isEscape } from '../utils.js';
 import FilterPresenter from './filters-presenter.js';
 import { MessageWithoutPoint, FiltersScheme, UserAction, COUNT_CITIES, Calendar, ButtonText, TimeLimit } from '../constants.js';
-import NewPointView from '/src/view/add-new-point-view.js';
+import NewPointView from '/src/view/new-point-view.js';
 import Loading from '/src/view/loading-view.js';
 import FailedLoadData from '/src/view/failed-load-data-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
@@ -86,7 +86,7 @@ export default class Presenter {
       this.#updatePoints();
       render(new FailedLoadData(), this.#contentBlock);
       throw new Error('Ошибка загрузки');
-    }
+        }
   }
 
   isCreatingNewPoint() {
@@ -95,13 +95,13 @@ export default class Presenter {
 
   #renderNewPointButton() {
     this.#newEventButton = document.querySelector('.trip-main__event-add-btn');
-    this.#newEventButton.addEventListener('click', this.#handleNewPointButtonClick);
+    this.#newEventButton.addEventListener('click', this.#newPointButtonClickHandler);
   }
 
-  #handleNewPointButtonClick = () => {
+  #newPointButtonClickHandler = () => {
 
     this.#clearEmptyMessage();
-    this.#handleModeChange();
+    this.#modeChangeHandler();
     this.#filterModel.setFilter(FiltersScheme.EVERYTHING);
     this.#currentSortType = 'day';
     this.#sorting.resetSortType();
@@ -126,9 +126,9 @@ export default class Presenter {
       },
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
-      onSave: this.#handleNewPointSave,
-      onCancel: this.#handleNewPointCancel,
-      onTypeChange: this.#handleTypeChange,
+      onSave: this.#newPointSaveHandler,
+      onCancel: this.newPointCancelHandler,
+      onTypeChange: this.#typeChangeHandler,
     });
 
     render(this.#creatingPointComponent, this.#newPointElement, RenderPosition.AFTERBEGIN);
@@ -137,7 +137,7 @@ export default class Presenter {
     this.#isCreatingNewPoint = true;
   };
 
-  #handleNewPointSave = async (point) => {
+  #newPointSaveHandler = async (point) => {
     this.#uiBlocker.block();
     this.#creatingPointComponent.updateButtonText(ButtonText.SAVING);
 
@@ -198,7 +198,7 @@ export default class Presenter {
     this.#updatePoints();
   };
 
-  #handleTypeChange = (newType) => {
+  #typeChangeHandler = (newType) => {
 
     const offerData = this.#offersModel.offers.find((offer) => offer.type === newType);
 
@@ -285,7 +285,7 @@ export default class Presenter {
   #clearPoints() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
-    this.#routePointList.element.innerHTML = '';
+    this.#routePointList.element.removeElement;
   }
 
   #renderPoints(points) {
@@ -297,8 +297,8 @@ export default class Presenter {
       routePointListElement: this.#routePointList.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
-      onDataChange: this.#handlePointChange,
-      onModeChange: this.#handleModeChange,
+      onDataChange: this.#pointChangeHandler,
+      onModeChange: this.#modeChangeHandler,
       onNewPointCancel: this.#handleNewPointCancel
     });
 
@@ -350,7 +350,7 @@ export default class Presenter {
     }, 0);
   }
 
-  #handlePointChange = (updatedPoint, actionType) => {
+  #pointChangeHandler = (updatedPoint, actionType) => {
     switch (actionType) {
       case UserAction.DELETE:
         this.#tripListModel.deletePoint(updatedPoint.id);
@@ -365,7 +365,7 @@ export default class Presenter {
     this.#updatePoints();
   };
 
-  #handleModeChange = () => {
+  #modeChangeHandler = () => {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 }

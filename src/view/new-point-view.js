@@ -76,16 +76,16 @@ function createNewPointTemplate(point, destinations, destinationTemplate, offerT
 export default class NewPointView extends AbstractView {
   #destinations;
   #offers;
-  #handleFormSubmit = null;
-  #handleFormCancel = null;
+  #onFormSubmit = null;
+  #onFormCancel = null;
   #point;
 
   constructor({ point, destinations, offers, onSave, onCancel }) {
     super();
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#handleFormSubmit = onSave;
-    this.#handleFormCancel = onCancel;
+    this.#onFormSubmit = onSave;
+    this.#onFormCancel = onCancel;
     this.#point = point;
     this.restoreHandlers();
     this.#initFlatpickr();
@@ -106,9 +106,9 @@ export default class NewPointView extends AbstractView {
   }
 
   updateButtonText(text) {
-    const saveButton = this.element.querySelector('.event__save-btn');
-    if (saveButton) {
-      saveButton.textContent = text;
+    const saveButtonElement = this.element.querySelector('.event__save-btn');
+    if (saveButtonElement) {
+      saveButtonElement.textContent = text;
     }
   }
 
@@ -132,28 +132,28 @@ export default class NewPointView extends AbstractView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
 
-    const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
-    const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
+    const startDateInputElement = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
+    const endDateInputElement = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked')).map((checkbox) => checkbox.id);
-    const destinationInput = this.element.querySelector('.event__input--destination').value;
-    const destination = this.#destinations.find((dest) => dest.name === destinationInput);
+    const destinationInputElement = this.element.querySelector('.event__input--destination').value;
+    const destination = this.#destinations.find((dest) => dest.name === destinationInputElement);
     const basePrice = parseInt(this.element.querySelector('.event__input--price').value, 10) || 0;
 
-    if (!startDateInput || !endDateInput || !destination || basePrice <= 0) {
+    if (!startDateInputElement || !endDateInputElement || !destination || basePrice <= 0) {
       this.shake();
       return;
     }
 
     const updatedPoint = {
       ...this.#point,
-      dateFrom: formatDateToISOString(startDateInput),
-      dateTo: formatDateToISOString(endDateInput),
+      dateFrom: formatDateToISOString(startDateInputElement),
+      dateTo: formatDateToISOString(endDateInputElement),
       offers: selectedOffers,
       destination: destination.id,
       basePrice: basePrice
     };
 
-    this.#handleFormSubmit(updatedPoint);
+    this.#onFormSubmit(updatedPoint);
     this.removeHandlers();
   };
 
@@ -198,28 +198,28 @@ export default class NewPointView extends AbstractView {
 
   #cancelClickHandler = (evt) => {
     evt.preventDefault();
-    if (this.#handleFormCancel) {
-      this.#handleFormCancel();
+    if (this.#onFormCancel) {
+      this.#onFormCancel();
     }
   };
 
   #initFlatpickr() {
-    const startTimeInput = this.element.querySelector('.event__input--time[name="event-start-time"]');
-    const endTimeInput = this.element.querySelector('.event__input--time[name="event-end-time"]');
+    const startTimeInputElement = this.element.querySelector('.event__input--time[name="event-start-time"]');
+    const endTimeInputElement = this.element.querySelector('.event__input--time[name="event-end-time"]');
 
-    if (!startTimeInput || !endTimeInput) {
+    if (!startTimeInputElement || !endTimeInputElement) {
       return;
     }
 
-    const endTimePicker = flatpickr(endTimeInput, {
+    const endTimePicker = flatpickr(endTimeInputElement, {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
-      minDate: startTimeInput.value,
+      minDate: startTimeInputElement.value,
       // eslint-disable-next-line camelcase
       time_24hr: true,
     });
 
-    flatpickr(startTimeInput, {
+    flatpickr(startTimeInputElement, {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
       // eslint-disable-next-line camelcase

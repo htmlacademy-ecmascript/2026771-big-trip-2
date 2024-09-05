@@ -3,10 +3,10 @@ import TripListModel from './model/trip-list-model.js';
 import DestinationsModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
 import FilterModel from './model/filters-model.js';
-import { AUTORISE, SERVER_URL } from './constants.js';
+import { AUTHORIZATION, SERVER_URL } from './constants.js';
 import PointsApiService from './api-service.js';
 
-const pointApiservice = new PointsApiService(SERVER_URL, AUTORISE);
+const pointApiservice = new PointsApiService(SERVER_URL, AUTHORIZATION);
 const tripListModel = new TripListModel({apiService: pointApiservice});
 const filterModel = new FilterModel();
 const destinationsModel = new DestinationsModel({apiService: pointApiservice});

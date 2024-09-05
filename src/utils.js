@@ -1,3 +1,5 @@
+import { MILLISECONDS_PER_MINUTE, MINUTES_PER_HOUR, HOURS_PER_DAY } from './constants.js';
+
 const isEscape = (evt) => evt.key === 'Escape';
 
 function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
@@ -6,10 +8,10 @@ function calculateEventDuration(dateFrom, dateTo, forCalculation = false) {
   const end = new Date(dateTo);
   const duration = end - start;
 
-  const totalMinutes = Math.floor(duration / 60000);
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
+  const totalMinutes = Math.floor(duration / MILLISECONDS_PER_MINUTE);
+  const days = Math.floor(totalMinutes / (MINUTES_PER_HOUR * HOURS_PER_DAY));
+  const hours = Math.floor((totalMinutes % (MINUTES_PER_HOUR * HOURS_PER_DAY)) / MINUTES_PER_HOUR);
+  const minutes = totalMinutes % MINUTES_PER_HOUR;
 
   if (forCalculation) {
     return duration;
@@ -44,7 +46,7 @@ function formatDateToISOString(dateStr) {
 function countPointsByFilter(points) {
   const currentDate = new Date();
   return {
-    everething: points.length,
+    everything: points.length,
     future: points.filter((point) => new Date(point.dateFrom) > currentDate).length,
     present: points.filter((point) => new Date(point.dateFrom) <= currentDate && new Date(point.dateTo) >= currentDate).length,
     past: points.filter((point) => new Date(point.dateTo) < currentDate).length,
