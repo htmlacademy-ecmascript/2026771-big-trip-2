@@ -30,7 +30,7 @@ export default class PointsApiService extends ApiService {
       const parsedResponse = await ApiService.parseResponse(response);
       return this.#adaptPointToClient(parsedResponse);
     } catch (error) {
-      throw new error('Ошибка при обновлении точки:', error);
+      throw new Error('Ошибка при обновлении точки:', error);
     }
   }
 
@@ -46,7 +46,7 @@ export default class PointsApiService extends ApiService {
       const parsedResponse = await ApiService.parseResponse(response);
       return this.#adaptPointToClient(parsedResponse);
     } catch (error) {
-      throw new error('Ошибка при добавлении точки:', error);
+      throw new Error('Ошибка при добавлении точки:', error);
     }
   }
 
@@ -57,7 +57,7 @@ export default class PointsApiService extends ApiService {
         method: Method.DELETE,
       });
     } catch (error) {
-      throw new error('Ошибка при удалении точки:', error);
+      throw new Error('Ошибка при удалении точки:', error);
     }
   }
 

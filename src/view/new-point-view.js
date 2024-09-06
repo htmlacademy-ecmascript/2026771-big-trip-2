@@ -4,7 +4,7 @@ import 'flatpickr/dist/flatpickr.css';
 import Offer from '/src/view/offer-view.js';
 import Destination from '/src/view/destination-view.js';
 import { formatDateToISOString } from '../utils.js';
-import { POINT_TYPES } from '../constants.js';
+import { POINT_TYPES, MILLISECONDS_PER_MINUTE, MINUTES_PER_HOUR } from '../constants.js';
 
 function createNewPointTemplate(point, destinations, destinationTemplate, offerTemplate) {
   const pointDestination = destinations.find((dest) => dest.id === point.destination);
@@ -128,6 +128,22 @@ export default class NewPointView extends AbstractView {
     this.element.querySelector('.event__input--destination').removeEventListener('input', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price').removeEventListener('input', this.#priceInputHandler);
   }
+
+  getPointData() {
+    const startDateInputElement = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
+    const endDateInputElement = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
+    const offsetTime = new Date().getTimezoneOffset() / MINUTES_PER_HOUR;
+    return {
+      isFavorite: this.#point.isFavorite,
+      type: this.#point.type,
+      offers: this.#point.offers,
+      destination: this.#point.destination,
+      dateFrom: new Date(new Date(formatDateToISOString(startDateInputElement)).getTime() + offsetTime * MINUTES_PER_HOUR * MILLISECONDS_PER_MINUTE).toUTCString(),
+      dateTo:  new Date(new Date(formatDateToISOString(endDateInputElement)).getTime() + offsetTime * MINUTES_PER_HOUR * MILLISECONDS_PER_MINUTE).toUTCString(),
+      basePrice: this.#point.basePrice
+    };
+  }
+
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();

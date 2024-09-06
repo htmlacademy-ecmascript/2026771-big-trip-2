@@ -85,8 +85,7 @@ export default class Presenter {
       this.#isDataLoadingError = true;
       this.#updatePoints();
       render(new FailedLoadData(), this.#contentBlock);
-      throw new Error('Ошибка загрузки');
-        }
+    }
   }
 
   isCreatingNewPoint() {
@@ -127,7 +126,7 @@ export default class Presenter {
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
       onSave: this.#newPointSaveHandler,
-      onCancel: this.newPointCancelHandler,
+      onCancel: this.#newPointCancelHandler,
       onTypeChange: this.#typeChangeHandler,
     });
 
@@ -151,18 +150,44 @@ export default class Presenter {
       this.#uiBlocker.unblock();
     } catch (error) {
       this.#creatingPointComponent.updateButtonText(ButtonText.SAVE);
-      this.#creatingPointComponent.shake();
-      throw new Error('Ошибка сохранения');
+      this.#creatingPointComponent.shake(() => {
+        this.#resetCreatingPointComponent();
+        this.#uiBlocker.unblock();
+      });
     }
+  };
+
+  #saveCurrentPointData = () => {
+    const pointData = this.#creatingPointComponent.getPointData();
+    return pointData;
+  };
+
+  #resetCreatingPointComponent = () => {
+
+    const savedData = this.#saveCurrentPointData();
+
+    remove(this.#creatingPointComponent);
+
+    this.#creatingPointComponent = new NewPointView({
+      point: savedData,
+      destinations: this.#destinationsModel.destinations,
+      offers: this.#offersModel.offers,
+      onSave: this.#newPointSaveHandler,
+      onCancel: this.#newPointCancelHandler,
+      onTypeChange: this.#typeChangeHandler,
+    });
+
+    render(this.#creatingPointComponent, this.#newPointElement, RenderPosition.AFTERBEGIN);
+    document.addEventListener('keydown', this.#escNewPointKeyDownHandler);
   };
 
   #escNewPointKeyDownHandler = (evt) => {
     if (isEscape(evt)) {
-      this.#handleNewPointCancel();
+      this.#newPointCancelHandler();
     }
   };
 
-  #handleNewPointCancel = () => {
+  #newPointCancelHandler = () => {
     if(this.#isCreatingNewPoint){
       this.#newEventButton.disabled = false;
       this.#isCreatingNewPoint = false;
@@ -285,7 +310,6 @@ export default class Presenter {
   #clearPoints() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
-    this.#routePointList.element.removeElement;
   }
 
   #renderPoints(points) {
@@ -299,7 +323,7 @@ export default class Presenter {
       offersModel: this.#offersModel,
       onDataChange: this.#pointChangeHandler,
       onModeChange: this.#modeChangeHandler,
-      onNewPointCancel: this.#handleNewPointCancel
+      onNewPointCancel: this.#newPointCancelHandler
     });
 
     pointPresenter.init(point);
@@ -350,16 +374,17 @@ export default class Presenter {
     }, 0);
   }
 
-  #pointChangeHandler = (updatedPoint, actionType) => {
+  #pointChangeHandler = async (updatedPoint, actionType) => {
+
     switch (actionType) {
       case UserAction.DELETE:
-        this.#tripListModel.deletePoint(updatedPoint.id);
+        await this.#tripListModel.deletePoint(updatedPoint.id);
         break;
       case UserAction.UPDATE:
-        this.#tripListModel.updatePoint(updatedPoint);
+        await this.#tripListModel.updatePoint(updatedPoint);
         break;
       case UserAction.ADD:
-        this.#tripListModel.addPoint(updatedPoint);
+        await this.#tripListModel.addPoint(updatedPoint);
         break;
     }
     this.#updatePoints();

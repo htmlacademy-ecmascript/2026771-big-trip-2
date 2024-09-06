@@ -124,21 +124,22 @@ export default class PointPresenter {
 
   #formSubmitHandler = async (updatedPoint) => {
     this.#uiBlocker.block();
-
     try {
       if (!updatedPoint) {
-        this.#pointEditComponent.deleteButtonText(ButtonText.DELETING);
+        this.#pointEditComponent.updateButtonText(ButtonText.DELETING);
         await this.#onDataChange(this.#point, UserAction.DELETE);
       } else {
         this.#pointEditComponent.updateButtonText(ButtonText.SAVING);
         await this.#onDataChange(updatedPoint, UserAction.UPDATE);
       }
-
-      this.#uiBlocker.unblock();
     } catch (error) {
-      throw new Error('Ошибка обновления');
+      this.#pointEditComponent.shake(() => {
+        this.#pointEditComponent.reset(this.#point);
+      });
+
+    } finally {
+      this.#uiBlocker.unblock();
     }
-    this.#pointEditComponent.updateButtonText(ButtonText.SAVE);
   };
 
   #deleteClickHandler = () => {

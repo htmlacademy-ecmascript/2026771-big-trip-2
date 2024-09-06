@@ -15,7 +15,7 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
   const pointId = point.id || 0;
   const iconSrc = type.toLowerCase();
   const localFromDate = new Date(new Date(dateFrom).getTime() + offsetTime * MINUTES_PER_HOUR * MILLISECONDS_PER_MINUTE).toUTCString();
-  const localToDate = new Date(new Date(dateTo).getTime() + offsetTime *MINUTES_PER_HOUR * MILLISECONDS_PER_MINUTE).toUTCString();
+  const localToDate = new Date(new Date(dateTo).getTime() + offsetTime * MINUTES_PER_HOUR * MILLISECONDS_PER_MINUTE).toUTCString();
 
   return (
     `<li class="trip-events__item">
