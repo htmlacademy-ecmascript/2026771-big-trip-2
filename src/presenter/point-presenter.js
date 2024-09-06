@@ -7,8 +7,8 @@ import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class PointPresenter {
   #routePointListElement;
-  #handleDataChange;
-  #handleModeChange;
+  #onDataChange;
+  #onModeChange;
   #pointComponent;
   #pointEditComponent;
   #point;
@@ -25,8 +25,8 @@ export default class PointPresenter {
     this.#routePointListElement = routePointListElement;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-    this.#handleDataChange = onDataChange;
-    this.#handleModeChange = onModeChange;
+    this.#onDataChange = onDataChange;
+    this.#onModeChange = onModeChange;
     this.#onNewPointCancel = onNewPointCancel;
   }
 
@@ -42,17 +42,17 @@ export default class PointPresenter {
       point: this.#point,
       destinations: destinations,
       offers: offers,
-      onEditClick: this.#handleEditClick,
-      onFavoriteClick: this.#handleFavoriteClick,
-      onDeleteClick: this.#handleDeleteClick,
+      onEditClick: this.#editClickHandler,
+      onFavoriteClick: this.#favoriteClickHandler,
+      onDeleteClick: this.#deleteClickHandler,
     });
 
     this.#pointEditComponent = new EditPoint({
       point: this.#point,
       destinations: destinations,
       offers: offers,
-      onFormSubmit: this.#handleFormSubmit,
-      onRollupClick: this.#handleRollupClick
+      onFormSubmit: this.#formSubmitHandler,
+      onRollupClick: this.#rollupClickHandler
     });
 
     if (!prevPointComponent || !prevPointEditComponent) {
@@ -91,7 +91,7 @@ export default class PointPresenter {
     }
     replace(this.#pointEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#handleModeChange();
+    this.#onModeChange();
     this.#mode = Mode.EDITING;
   }
 
@@ -109,40 +109,41 @@ export default class PointPresenter {
     }
   };
 
-  #handleEditClick = () => {
+  #editClickHandler = () => {
     this.#replaceCardToForm();
   };
 
-  #handleRollupClick = () => {
+  #rollupClickHandler = () => {
     this.#pointEditComponent.reset(this.#point);
     this.#replaceFormToCard();
   };
 
-  #handleFavoriteClick = () => {
-    this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite }, UserAction.UPDATE);
+  #favoriteClickHandler = () => {
+    this.#onDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite }, UserAction.UPDATE);
   };
 
-  #handleFormSubmit = async (updatedPoint) => {
+  #formSubmitHandler = async (updatedPoint) => {
     this.#uiBlocker.block();
-
     try {
       if (!updatedPoint) {
-        this.#pointEditComponent.deleteButtonText(ButtonText.DELETING);
-        await this.#handleDataChange(this.#point, UserAction.DELETE);
+        this.#pointEditComponent.updateButtonText(ButtonText.DELETING);
+        await this.#onDataChange(this.#point, UserAction.DELETE);
       } else {
         this.#pointEditComponent.updateButtonText(ButtonText.SAVING);
-        await this.#handleDataChange(updatedPoint, UserAction.UPDATE);
+        await this.#onDataChange(updatedPoint, UserAction.UPDATE);
       }
-
-      this.#uiBlocker.unblock();
     } catch (error) {
-      throw new Error('Ошибка обновления');
+      this.#pointEditComponent.shake(() => {
+        this.#pointEditComponent.reset(this.#point);
+      });
+
+    } finally {
+      this.#uiBlocker.unblock();
     }
-    this.#pointEditComponent.updateButtonText(ButtonText.SAVE);
   };
 
-  #handleDeleteClick = () => {
-    this.#handleFormSubmit(null);
+  #deleteClickHandler = () => {
+    this.#formSubmitHandler(null);
 
   };
 }

@@ -36,14 +36,14 @@ export default class Filter extends AbstractView {
     this.#pointsCount = countPointsByFilter(points);
     this.#currentFilter = currentFilter;
     this.#onFilterChange = onFilterChange;
-    this.element.addEventListener('change', this.#handleFilterChange);
+    this.element.addEventListener('change', this.#filterChangeHandler);
   }
 
   get template() {
     return createFilterTemplate(this.#pointsCount, this.#currentFilter);
   }
 
-  #handleFilterChange = (event) => {
+  #filterChangeHandler = (event) => {
     if (event.target.name === 'trip-filter') {
       this.#onFilterChange(event.target.value);
     }

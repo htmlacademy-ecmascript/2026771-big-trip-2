@@ -4,9 +4,9 @@ import 'flatpickr/dist/flatpickr.css';
 import Offer from '/src/view/offer-view.js';
 import Destination from '/src/view/destination-view.js';
 import { formatDateToISOString } from '../utils.js';
-import { POINT_TYPES } from '../constants.js';
+import { POINT_TYPES, MILLISECONDS_PER_MINUTE, MINUTES_PER_HOUR } from '../constants.js';
 
-const offsetTime = new Date().getTimezoneOffset() / 60;
+const offsetTime = new Date().getTimezoneOffset() / MINUTES_PER_HOUR;
 
 function createEditPointTemplate(point, destinations, destinationTemplate, offerTemplate) {
   const pointDestination = destinations.find((dest)=>dest.id === point.destination);
@@ -14,8 +14,8 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
   const {name} = pointDestination || {};
   const pointId = point.id || 0;
   const iconSrc = type.toLowerCase();
-  const localFromDate = new Date(new Date(dateFrom).getTime() + offsetTime * 3600000).toUTCString();
-  const localToDate = new Date(new Date(dateTo).getTime() + offsetTime * 3600000).toUTCString();
+  const localFromDate = new Date(new Date(dateFrom).getTime() + offsetTime * MINUTES_PER_HOUR * MILLISECONDS_PER_MINUTE).toUTCString();
+  const localToDate = new Date(new Date(dateTo).getTime() + offsetTime * MINUTES_PER_HOUR * MILLISECONDS_PER_MINUTE).toUTCString();
 
   return (
     `<li class="trip-events__item">
@@ -86,16 +86,16 @@ function createEditPointTemplate(point, destinations, destinationTemplate, offer
 export default class EditPoint extends AbstractStatefulView {
   #destinations;
   #offers;
-  #handleFormSubmit = null;
-  #handleRollupClick = null;
+  #onFormSubmit = null;
+  #onRollupClick = null;
 
   constructor({ point, destinations, offers, onFormSubmit, onRollupClick }) {
     super();
     this._state = EditPoint.parsePointToState(point);
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#handleFormSubmit = onFormSubmit;
-    this.#handleRollupClick = onRollupClick;
+    this.#onFormSubmit = onFormSubmit;
+    this.#onRollupClick = onRollupClick;
 
     this._restoreHandlers();
     this.#initFlatpickr();
@@ -118,16 +118,16 @@ export default class EditPoint extends AbstractStatefulView {
   }
 
   updateButtonText(text) {
-    const saveButton = this.element.querySelector('.event__save-btn');
-    if (saveButton) {
-      saveButton.textContent = text;
+    const saveButtonElement = this.element.querySelector('.event__save-btn');
+    if (saveButtonElement) {
+      saveButtonElement.textContent = text;
     }
   }
 
   deleteButtonText(text) {
-    const deleteButton = this.element.querySelector('.event__reset-btn');
-    if (deleteButton) {
-      deleteButton.textContent = text;
+    const deleteButtonElement = this.element.querySelector('.event__reset-btn');
+    if (deleteButtonElement) {
+      deleteButtonElement.textContent = text;
     }
   }
 
@@ -152,34 +152,34 @@ export default class EditPoint extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
 
-    const startDateInput = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
-    const endDateInput = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
+    const startDateInputElement = this.element.querySelector('.event__input--time[name="event-start-time"]').value;
+    const endDateInputElement = this.element.querySelector('.event__input--time[name="event-end-time"]').value;
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'))
       .map((checkbox) => checkbox.id);
-    const destinationInput = this.element.querySelector('.event__input--destination').value;
-    const destination = this.#destinations.find((dest) => dest.name === destinationInput);
+    const destinationInputElement = this.element.querySelector('.event__input--destination').value;
+    const destination = this.#destinations.find((dest) => dest.name === destinationInputElement);
     const basePrice = parseInt(this.element.querySelector('.event__input--price').value, 10) || 0;
 
-    if (!startDateInput || !endDateInput || !destination || basePrice <= 0) {
+    if (!startDateInputElement || !endDateInputElement || !destination || basePrice <= 0) {
       this.shake();
       return;
     }
 
     this.updateElement({
-      dateFrom: formatDateToISOString(startDateInput),
-      dateTo: formatDateToISOString(endDateInput),
+      dateFrom: formatDateToISOString(startDateInputElement),
+      dateTo: formatDateToISOString(endDateInputElement),
       offers: selectedOffers,
       destination: destination.id,
       basePrice: basePrice
     });
-    this.#handleFormSubmit(EditPoint.parseStateToPoint(this._state));
+    this.#onFormSubmit(EditPoint.parseStateToPoint(this._state));
     this._removeEventListeners();
   };
 
 
   #rollupClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleRollupClick();
+    this.#onRollupClick();
     this.#initFlatpickr();
   };
 
@@ -219,23 +219,23 @@ export default class EditPoint extends AbstractStatefulView {
 
   #deleteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(null);
+    this.#onFormSubmit(null);
   };
 
 
   #initFlatpickr() {
-    const startTimeInput = this.element.querySelector(`#event-start-time-${this._state.id}`);
-    const endTimeInput = this.element.querySelector(`#event-end-time-${this._state.id}`);
+    const startTimeInputElement = this.element.querySelector(`#event-start-time-${this._state.id}`);
+    const endTimeInputElement = this.element.querySelector(`#event-end-time-${this._state.id}`);
 
-    const endTimePicker = flatpickr(endTimeInput, {
+    const endTimePicker = flatpickr(endTimeInputElement, {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
-      minDate: startTimeInput.value,
+      minDate: startTimeInputElement.value,
       // eslint-disable-next-line camelcase
       time_24hr: true,
     });
 
-    flatpickr(startTimeInput, {
+    flatpickr(startTimeInputElement, {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
       // eslint-disable-next-line camelcase

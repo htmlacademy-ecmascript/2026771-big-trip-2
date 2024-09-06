@@ -31,6 +31,6 @@ export default class PageTop extends AbstractView {
     this._dates = dates;
     this._cost = cost;
 
-    this.element.innerHTML = createPageTopTemplate({ title: this._title, dates: this._dates, cost: this._cost });
+    this.element.innerHTML = this.template;
   }
 }
